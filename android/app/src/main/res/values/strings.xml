@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Revamp AI PC Builder</string>
+    <string name="title_activity_main">Revamp AI PC Builder</string>
+    <string name="package_name">com.revampai.pcbuilder</string>
+    <string name="custom_url_scheme">com.revampai.pcbuilder</string>
+</resources>
