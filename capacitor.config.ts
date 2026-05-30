@@ -1,0 +1,34 @@
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.revampai.pcbuilder',
+  appName: 'Revamp AI PC Builder',
+  webDir: 'dist',
+  server: {
+    androidScheme: 'https',
+    cleartext: true
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: '#0F172A',
+      showSpinner: true,
+      spinnerColor: '#3B82F6'
+    },
+    StatusBar: {
+      style: 'dark',
+      backgroundColor: '#0F172A'
+    }
+  },
+  android: {
+    allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: false
+  },
+  ios: {
+    scheme: 'Revamp AI PC Builder',
+    contentInset: 'always'
+  }
+};
+
+export default config;
