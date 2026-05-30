@@ -10,154 +10,127 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { Heart, Share2, Search, Filter, Star, Clock, DollarSign, User } from "lucide-react";
+import { Heart, Share2, Search, Star, User, RefreshCw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { Build } from "@/types/database";
 
-const staticBuilds = [
+const staticBuilds: Build[] = [
   {
     id: 1,
+    user_id: "system",
     title: "Ultimate Gaming Beast",
     description: "High-end gaming build for 4K gaming at 144fps",
-    price: 180000,
-    rating: 4.9,
+    total_price: 180000,
+    parts: {} as any,
+    performance: "High-End",
     likes: 247,
+    created_at: "2024-01-15",
     author: "TechBuilder_Pro",
     image: "/placeholder.svg",
     category: "Gaming",
     specs: ["RTX 4080", "i7-13700K", "32GB DDR5"],
-    created: "2024-01-15",
-    difficulty: "Advanced"
+    difficulty: "Advanced",
+    rating: 4.9
   },
   {
     id: 2,
+    user_id: "system",
     title: "Budget Productivity Workstation",
     description: "Efficient build for office work and light content creation",
-    price: 65000,
-    rating: 4.7,
+    total_price: 65000,
+    parts: {} as any,
+    performance: "Entry-Level",
     likes: 189,
+    created_at: "2024-01-12",
     author: "BudgetBuilder",
     image: "/placeholder.svg",
     category: "Workstation",
     specs: ["GTX 1660 Super", "Ryzen 5 5600", "16GB DDR4"],
-    created: "2024-01-12",
-    difficulty: "Beginner"
+    difficulty: "Beginner",
+    rating: 4.7
   },
   {
     id: 3,
+    user_id: "system",
     title: "Content Creator Pro",
     description: "Perfect balance for streaming, editing, and gaming",
-    price: 125000,
-    rating: 4.8,
+    total_price: 125000,
+    parts: {} as any,
+    performance: "Mid-Range",
     likes: 312,
+    created_at: "2024-01-10",
     author: "StreamMaster",
     image: "/placeholder.svg",
     category: "Creator",
     specs: ["RTX 4070", "Ryzen 7 7700X", "32GB DDR5"],
-    created: "2024-01-10",
-    difficulty: "Intermediate"
-  },
-  {
-    id: 4,
-    title: "Compact ITX Gaming",
-    description: "Small form factor build with big performance",
-    price: 95000,
-    rating: 4.6,
-    likes: 156,
-    author: "MiniPCGuru",
-    image: "/placeholder.svg",
-    category: "Gaming",
-    specs: ["RTX 4060 Ti", "i5-13600K", "16GB DDR5"],
-    created: "2024-01-08",
-    difficulty: "Advanced"
-  },
-  {
-    id: 5,
-    title: "RGB Showcase Build",
-    description: "Beautiful aesthetics with solid performance",
-    price: 110000,
-    rating: 4.5,
-    likes: 289,
-    author: "RGBMaster",
-    image: "/placeholder.svg",
-    category: "Gaming",
-    specs: ["RTX 4060", "Ryzen 5 7600", "16GB DDR5"],
-    created: "2024-01-05",
-    difficulty: "Intermediate"
-  },
-  {
-    id: 6,
-    title: "Workstation Powerhouse",
-    description: "Professional grade build for heavy workloads",
-    price: 220000,
-    rating: 5.0,
-    likes: 95,
-    author: "ProBuilder",
-    image: "/placeholder.svg",
-    category: "Workstation",
-    specs: ["RTX 4090", "i9-13900K", "64GB DDR5"],
-    created: "2024-01-03",
-    difficulty: "Expert"
+    difficulty: "Intermediate",
+    rating: 4.8
   }
 ];
 
 const BuildsContent = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("latest");
   const [activeTab, setActiveTab] = useState("community");
-  const [savedBuilds, setSavedBuilds] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [savedBuilds, setSavedBuilds] = useState<Build[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (activeTab === "my-builds") {
+    if (activeTab === "my-builds" && user) {
       fetchMyBuilds();
     }
   }, [activeTab, user]);
 
   const fetchMyBuilds = async () => {
     if (!user) return;
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('builds')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      toast.error("Failed to fetch your builds");
-    } else {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from('builds')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
       setSavedBuilds(data || []);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch builds");
+      toast.error("Database connection error");
+    } finally {
+      setIsLoading(false);
     }
-    setLoading(false);
   };
 
-  const handleLike = async (build: any) => {
+  const handleLike = async (build: Build) => {
     if (activeTab === "community") {
       toast.success("Build added to your favorites!");
       return;
     }
 
-    const { error } = await supabase
-      .from('builds')
-      .update({ likes: (build.likes || 0) + 1 })
-      .eq('id', build.id);
-    
-    if (!error) {
+    try {
+      const { error } = await supabase
+        .from('builds')
+        .update({ likes: (build.likes || 0) + 1 })
+        .eq('id', build.id);
+      
+      if (error) throw error;
       setSavedBuilds(savedBuilds.map(b => b.id === build.id ? { ...b, likes: (b.likes || 0) + 1 } : b));
       toast.success("Build liked!");
-    } else {
-      toast.error("Failed to like build");
+    } catch (err: any) {
+      toast.error("Failed to update likes");
     }
   };
 
   const handleShare = (title: string) => {
     if (navigator.share) {
       navigator.share({
-        title: title,
-        text: `Check out this cool PC build on Revamp AI: ${title}`,
+        title,
+        text: `Check out this PC build on Revamp AI: ${title}`,
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -165,11 +138,10 @@ const BuildsContent = () => {
     }
   };
 
-  const displayBuilds = activeTab === "community" 
+  const displayBuilds: Build[] = activeTab === "community" 
     ? staticBuilds 
     : savedBuilds.map(b => ({
         ...b,
-        price: b.total_price,
         author: user?.name || "Me",
         difficulty: b.performance === 'High-End' ? 'Advanced' : 'Intermediate',
         category: 'Custom',
@@ -179,20 +151,10 @@ const BuildsContent = () => {
   const filteredBuilds = displayBuilds.filter(build => {
     const matchesSearch = build.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          build.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         build.specs.some((spec: string) => spec.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = filterCategory === "all" || build.category.toLowerCase() === filterCategory.toLowerCase();
+                         (build.specs?.some(spec => spec.toLowerCase().includes(searchTerm.toLowerCase())) ?? false);
+    const matchesCategory = filterCategory === "all" || build.category?.toLowerCase() === filterCategory.toLowerCase();
     return matchesSearch && matchesCategory;
   });
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-orange-100 text-orange-800';
-      case 'Expert': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -206,14 +168,11 @@ const BuildsContent = () => {
             transition={{ duration: 0.5 }}
           >
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-tech-dark mb-2">
-                Build Showcase
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-tech-dark mb-2">Build Showcase</h1>
               <p className="text-lg text-gray-600">
-                {activeTab === "community" ? "Discover amazing PC builds from our community" : "Your personal collection of saved PC configurations"}
+                {activeTab === "community" ? "Discover amazing PC builds" : "Your personal collection"}
               </p>
             </div>
-            
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="community">Community</TabsTrigger>
@@ -222,22 +181,14 @@ const BuildsContent = () => {
             </Tabs>
           </motion.div>
 
-          {/* Filters */}
           <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border border-gray-100">
             <div className="flex flex-col md:flex-row gap-4 items-center">
               <div className="relative flex-1 w-full">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search builds..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <Input placeholder="Search builds..." className="pl-10" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
+                <SelectTrigger className="w-full md:w-48"><SelectValue placeholder="Category" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   <SelectItem value="gaming">Gaming</SelectItem>
@@ -246,118 +197,38 @@ const BuildsContent = () => {
                   <SelectItem value="custom">Custom</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="latest">Latest</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
-          {/* Builds Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading ? (
-              <div className="col-span-full text-center py-12">Loading builds...</div>
-            ) : filteredBuilds.map((build, index) => (
-              <motion.div
-                key={build.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-              >
-                <Card className="group hover:shadow-lg transition-all duration-300 h-full flex flex-col">
-                  <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden relative">
-                    <img 
-                      src={build.image || "/placeholder.svg"} 
-                      alt={build.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {activeTab === "my-builds" && (
-                      <div className="absolute top-2 right-2">
-                        <Badge className="bg-tech-purple">Saved</Badge>
-                      </div>
-                    )}
-                  </div>
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <Badge className={getDifficultyColor(build.difficulty)}>
-                        {build.difficulty}
-                      </Badge>
-                      <Badge variant="secondary">{build.category}</Badge>
-                    </div>
-                    <CardTitle className="text-lg line-clamp-2">{build.title}</CardTitle>
-                    <p className="text-sm text-gray-600 line-clamp-2">{build.description}</p>
-                  </CardHeader>
-                  <CardContent className="pt-0 flex-grow">
-                    <div className="space-y-3">
-                      <div className="flex flex-wrap gap-1">
-                        {build.specs.map((spec: string, i: number) => (
-                          <Badge key={i} variant="outline" className="text-xs">
-                            {spec}
-                          </Badge>
-                        ))}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span>{build.rating || "5.0"}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Heart className="h-4 w-4" />
-                          <span>{build.likes || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-2 font-bold text-tech-dark">
-                          <span>₹{Number(build.price).toLocaleString()}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between pt-2 border-t mt-auto">
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                          <User className="w-3 h-3" />
-                          <span>{build.author}</span>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleLike(build)}>
-                            <Heart className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleShare(build.title)}>
-                            <Share2 className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" className="bg-tech-accent hover:bg-tech-accent/90">
-                            View
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
+          {error ? (
+            <Card className="p-12 text-center border-red-100">
+              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold">Connection Error</h3>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <Button onClick={fetchMyBuilds} variant="outline" className="gap-2">
+                <RefreshCw className="w-4 h-4" /> Retry
+              </Button>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {isLoading ? (
+                <div className="col-span-full text-center py-24">
+                  <RefreshCw className="w-10 h-10 animate-spin mx-auto text-tech-purple mb-4" />
+                  <p className="text-muted-foreground">Fetching your builds from the cloud...</p>
+                </div>
+              ) : filteredBuilds.map((build, index) => (
+                <BuildCard key={build.id} build={build} index={index} onLike={() => handleLike(build)} onShare={() => handleShare(build.title)} isSavedTab={activeTab === 'my-builds'} />
+              ))}
+            </div>
+          )}
 
-          {filteredBuilds.length === 0 && !loading && (
-            <div className="text-center py-24 bg-white rounded-xl shadow-sm border border-dashed border-gray-200">
+          {filteredBuilds.length === 0 && !isLoading && !error && (
+            <div className="text-center py-24 bg-white rounded-xl border border-dashed border-gray-200">
               <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {activeTab === "my-builds" ? "You haven't saved any builds yet" : "No builds found"}
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No builds found</h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                {activeTab === "my-builds" 
-                  ? "Start building your dream PC and click 'Save Build' to see it here!" 
-                  : "Try adjusting your search or filters to find what you're looking for."}
+                {activeTab === "my-builds" ? "Start building your dream PC and click 'Save Build'!" : "Try adjusting your filters."}
               </p>
-              {activeTab === "my-builds" && (
-                <Button className="mt-6 bg-tech-purple" asChild>
-                  <Link to="/">Start Building</Link>
-                </Button>
-              )}
             </div>
           )}
         </div>
@@ -367,12 +238,59 @@ const BuildsContent = () => {
   );
 };
 
-const Builds = () => {
-  return (
-    <BuildProvider>
-      <BuildsContent />
-    </BuildProvider>
-  );
+const BuildCard = ({ build, index, onLike, onShare, isSavedTab }: { build: Build, index: number, onLike: () => void, onShare: () => void, isSavedTab: boolean }) => (
+  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.05 }}>
+    <Card className="group hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+      <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden relative">
+        <img src={build.image || "/placeholder.svg"} alt={build.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        {isSavedTab && <div className="absolute top-2 right-2"><Badge className="bg-tech-purple">Cloud Saved</Badge></div>}
+      </div>
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start mb-2">
+          <Badge className={getDifficultyColor(build.difficulty || 'Intermediate')}>{build.difficulty || 'Intermediate'}</Badge>
+          <Badge variant="secondary">{build.category}</Badge>
+        </div>
+        <CardTitle className="text-lg line-clamp-2">{build.title}</CardTitle>
+        <p className="text-sm text-gray-600 line-clamp-2">{build.description}</p>
+      </CardHeader>
+      <CardContent className="pt-0 flex-grow">
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-1">
+            {build.specs?.map((spec, i) => <Badge key={i} variant="outline" className="text-xs">{spec}</Badge>)}
+          </div>
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center gap-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span>{build.rating || "5.0"}</span></div>
+            <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>{build.likes || 0}</span></div>
+            <div className="flex items-center gap-2 font-bold text-tech-dark"><span>₹{Number(build.total_price || build.price).toLocaleString()}</span></div>
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t mt-auto">
+            <div className="flex items-center gap-1.5 text-xs text-gray-500"><User className="w-3 h-3" /><span>{build.author}</span></div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={onLike}><Heart className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" onClick={onShare}><Share2 className="h-4 w-4" /></Button>
+              <Button size="sm" className="bg-tech-accent hover:bg-tech-accent/90">View</Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+);
+
+const getDifficultyColor = (difficulty: string) => {
+  switch (difficulty) {
+    case 'Beginner': return 'bg-green-100 text-green-800';
+    case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
+    case 'Advanced': return 'bg-orange-100 text-orange-800';
+    case 'Expert': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
 };
+
+const Builds = () => (
+  <BuildProvider>
+    <BuildsContent />
+  </BuildProvider>
+);
 
 export default Builds;

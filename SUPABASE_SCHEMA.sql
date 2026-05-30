@@ -33,10 +33,22 @@ CREATE TABLE builds (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. Set up Row Level Security (RLS)
+-- 4. Create orders table for Sellers
+CREATE TABLE orders (
+  id TEXT PRIMARY KEY, -- We'll use custom IDs like ORD-001
+  seller_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  customer_name TEXT NOT NULL,
+  items TEXT[] NOT NULL,
+  total_price NUMERIC NOT NULL,
+  status TEXT DEFAULT 'Pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 5. Set up Row Level Security (RLS)
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE builds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Anyone can read, only owner can update
 CREATE POLICY "Public profiles are viewable by everyone." ON profiles FOR SELECT USING (true);
@@ -52,7 +64,11 @@ CREATE POLICY "Anyone can view public builds." ON builds FOR SELECT USING (is_pu
 CREATE POLICY "Users can manage their own builds." ON builds 
   FOR ALL USING (auth.uid() = user_id);
 
--- 5. Trigger to create profile on signup
+-- Orders: Only sellers can see and manage their own orders
+CREATE POLICY "Sellers can manage their own orders." ON orders
+  FOR ALL USING (auth.uid() = seller_id);
+
+-- 6. Trigger to create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN

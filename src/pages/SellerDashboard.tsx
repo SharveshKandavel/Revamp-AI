@@ -16,7 +16,9 @@ import {
   PlusCircle,
   Edit,
   Trash,
-  Search
+  Search,
+  AlertTriangle,
+  RefreshCw
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,16 +42,18 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Product, Order } from "@/types/database";
 
 const SellerDashboardContent = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [products, setProducts] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -60,29 +64,47 @@ const SellerDashboardContent = () => {
 
   useEffect(() => {
     if (user) {
-      fetchProducts();
-      fetchOrders();
+      loadInitialData();
     }
   }, [user]);
 
+  const loadInitialData = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await Promise.all([fetchProducts(), fetchOrders()]);
+    } catch (err: any) {
+      setError(err.message || "Failed to load dashboard data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchProducts = async () => {
     if (!user) return;
-    setLoading(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('seller_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (error) toast({ title: "Error fetching products", description: error.message, variant: "destructive" });
-    else setProducts(data || []);
-    setLoading(false);
+    if (error) throw error;
+    setProducts(data || []);
   };
 
   const fetchOrders = async () => {
-    // Note: In a full system, orders would have a join with products/sellers
-    // For this portfolio version, we'll simulate orders or read from a mock table
-    const { data } = await supabase.from('orders').select('*').limit(10);
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('seller_id', user.id)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.warn("Orders table might be missing:", error.message);
+      // We don't throw here to allow products to still show
+      return;
+    }
     setOrders(data || []);
   };
 
@@ -92,7 +114,7 @@ const SellerDashboardContent = () => {
     setIsDialogOpen(true);
   };
 
-  const handleOpenEdit = (product: any) => {
+  const handleOpenEdit = (product: Product) => {
     setEditingProduct(product);
     setFormData({
       name: product.name,
@@ -119,45 +141,84 @@ const SellerDashboardContent = () => {
       image_url: "/placeholder.svg"
     };
 
-    if (editingProduct) {
-      const { error } = await supabase
-        .from('products')
-        .update(productData)
-        .eq('id', editingProduct.id);
-      
-      if (error) toast({ title: "Update failed", description: error.message, variant: "destructive" });
-      else {
+    try {
+      if (editingProduct) {
+        const { error } = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', editingProduct.id);
+        
+        if (error) throw error;
         toast({ title: "Product updated" });
-        fetchProducts();
-        setIsDialogOpen(false);
-      }
-    } else {
-      const { error } = await supabase
-        .from('products')
-        .insert([productData]);
-      
-      if (error) toast({ title: "Insert failed", description: error.message, variant: "destructive" });
-      else {
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .insert([productData]);
+        
+        if (error) throw error;
         toast({ title: "Product added" });
-        fetchProducts();
-        setIsDialogOpen(false);
       }
+      await fetchProducts();
+      setIsDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
     }
   };
 
   const handleDeleteProduct = async (id: number) => {
-    const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) toast({ title: "Delete failed", description: error.message, variant: "destructive" });
-    else {
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
       toast({ title: "Product deleted" });
       setProducts(products.filter(p => p.id !== id));
+    } catch (err: any) {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
     }
   };
 
-  const filteredProducts = products.filter((product: any) => 
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      toast({ title: "Order status updated" });
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    } catch (err: any) {
+      toast({ title: "Update failed", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const filteredProducts = products.filter((product) => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header />
+        <main className="flex-grow flex items-center justify-center p-4">
+          <Card className="max-w-md w-full border-red-100 shadow-lg">
+            <CardHeader className="text-center">
+              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <CardTitle className="text-xl">Dashboard Error</CardTitle>
+              <CardDescription>{error}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Button onClick={loadInitialData} className="gap-2">
+                <RefreshCw className="w-4 h-4" />
+                Retry Loading
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const salesData = [
     { name: 'Jan', sales: 42000 },
@@ -168,12 +229,7 @@ const SellerDashboardContent = () => {
     { name: 'Jun', sales: 74000 },
   ];
 
-  const statsCards = [
-    { title: "Total Products", value: products.length, icon: <Package className="h-8 w-8 text-tech-purple" />, change: "+5%" },
-    { title: "Active Orders", value: orders.length, icon: <ShoppingCart className="h-8 w-8 text-tech-green" />, change: "+12%" },
-    { title: "Active Customers", value: 847, icon: <Users className="h-8 w-8 text-tech-blue" />, change: "+18%" },
-    { title: "Revenue", value: `₹${(products.reduce((acc, p) => acc + (p.price * p.stock), 0) / 10).toLocaleString()}`, icon: <TrendingUp className="h-8 w-8 text-tech-accent" />, change: "+3%" },
-  ];
+  const revenue = products.reduce((acc, p) => acc + (p.price * p.stock), 0) / 10;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -195,28 +251,10 @@ const SellerDashboardContent = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            {statsCards.map((card, index) => (
-              <motion.div
-                key={card.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="hover-scale">
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-lg font-medium">{card.title}</CardTitle>
-                    {card.icon}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{card.value}</div>
-                    <p className="text-sm text-green-600 flex items-center mt-1">
-                      {card.change}
-                      <TrendingUp className="h-4 w-4 ml-1" />
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            <StatsCard title="Total Products" value={products.length} icon={<Package className="h-8 w-8 text-tech-purple" />} change="+5%" />
+            <StatsCard title="Active Orders" value={orders.length} icon={<ShoppingCart className="h-8 w-8 text-tech-green" />} change="+12%" />
+            <StatsCard title="Active Customers" value={847} icon={<Users className="h-8 w-8 text-tech-blue" />} change="+18%" />
+            <StatsCard title="Revenue" value={`₹${revenue.toLocaleString()}`} icon={<TrendingUp className="h-8 w-8 text-tech-accent" />} change="+3%" />
           </div>
 
           <Tabs defaultValue="products" className="mb-10">
@@ -225,13 +263,12 @@ const SellerDashboardContent = () => {
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="orders">Orders</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="products">
               <Card>
                 <CardHeader>
                   <CardTitle>Inventory Management</CardTitle>
-                  <CardDescription>
-                    Manage your PC parts and components inventory
-                  </CardDescription>
+                  <CardDescription>Manage your PC parts and components inventory</CardDescription>
                   <div className="flex justify-between items-center mt-4">
                     <div className="relative w-full max-w-sm">
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -242,169 +279,83 @@ const SellerDashboardContent = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
-                    
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          onClick={handleOpenAdd} 
-                          className="ml-4 bg-tech-purple hover:bg-tech-purple/90"
-                        >
-                          <PlusCircle className="mr-2 h-4 w-4" />
-                          Add Product
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
-                          <DialogDescription>
-                            Enter the details of the PC component here.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right">Name</Label>
-                            <Input
-                              id="name"
-                              value={formData.name}
-                              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              className="col-span-3"
-                            />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="category" className="text-right">Category</Label>
-                            <Select 
-                              value={formData.category} 
-                              onValueChange={(val) => setFormData({ ...formData, category: val })}
-                            >
-                              <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="CPU">CPU</SelectItem>
-                                <SelectItem value="GPU">GPU</SelectItem>
-                                <SelectItem value="Motherboard">Motherboard</SelectItem>
-                                <SelectItem value="RAM">RAM</SelectItem>
-                                <SelectItem value="Storage">Storage</SelectItem>
-                                <SelectItem value="Power Supply">Power Supply</SelectItem>
-                                <SelectItem value="Case">Case</SelectItem>
-                                <SelectItem value="Monitor">Monitor</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="price" className="text-right">Price (₹)</Label>
-                            <Input
-                              id="price"
-                              type="number"
-                              value={formData.price}
-                              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                              className="col-span-3"
-                            />
-                          </div>
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="stock" className="text-right">Stock</Label>
-                            <Input
-                              id="stock"
-                              type="number"
-                              value={formData.stock}
-                              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                              className="col-span-3"
-                            />
-                          </div>
-                          <DialogFooter>
-                            <Button type="submit">{editingProduct ? "Save Changes" : "Add Product"}</Button>
-                          </DialogFooter>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
+                    <Button onClick={handleOpenAdd} className="ml-4 bg-tech-purple hover:bg-tech-purple/90">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Product
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-4 px-2">Product</th>
-                          <th className="text-left py-4 px-2">Category</th>
-                          <th className="text-left py-4 px-2">Price</th>
-                          <th className="text-left py-4 px-2">Stock</th>
-                          <th className="text-left py-4 px-2">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredProducts.map((product: any) => (
-                          <tr key={product.id} className="border-b hover:bg-gray-50">
-                            <td className="py-4 px-2">
-                              <div className="flex items-center">
-                                <img 
-                                  src={product.image_url || "/placeholder.svg"} 
-                                  alt={product.name} 
-                                  className="w-10 h-10 mr-3 rounded-md object-cover" 
-                                />
-                                <span>{product.name}</span>
-                              </div>
-                            </td>
-                            <td className="py-4 px-2">{product.category}</td>
-                            <td className="py-4 px-2">₹{product.price.toLocaleString()}</td>
-                            <td className="py-4 px-2">
-                              <span className={`px-2 py-1 rounded-full text-xs ${
-                                product.stock > 10 ? 'bg-green-100 text-green-800' : 
-                                product.stock > 5 ? 'bg-yellow-100 text-yellow-800' : 
-                                'bg-red-100 text-red-800'
-                              }`}>
-                                {product.stock} units
-                              </span>
-                            </td>
-                            <td className="py-4 px-2">
-                              <div className="flex space-x-2">
-                                <Button variant="outline" size="sm" onClick={() => handleOpenEdit(product)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="text-red-500 hover:text-red-700"
-                                  onClick={() => handleDeleteProduct(product.id)}
-                                >
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </td>
+                  {isLoading ? (
+                    <div className="text-center py-12">
+                      <RefreshCw className="w-8 h-8 animate-spin mx-auto text-tech-purple mb-2" />
+                      <p className="text-muted-foreground">Fetching inventory...</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-4 px-2">Product</th>
+                            <th className="text-left py-4 px-2">Category</th>
+                            <th className="text-left py-4 px-2">Price</th>
+                            <th className="text-left py-4 px-2">Stock</th>
+                            <th className="text-left py-4 px-2">Actions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {loading && <p className="text-center py-4">Loading inventory...</p>}
+                        </thead>
+                        <tbody>
+                          {filteredProducts.map((product) => (
+                            <tr key={product.id} className="border-b hover:bg-gray-50">
+                              <td className="py-4 px-2">
+                                <div className="flex items-center">
+                                  <img src={product.image_url} alt={product.name} className="w-10 h-10 mr-3 rounded-md object-cover" />
+                                  <span>{product.name}</span>
+                                </div>
+                              </td>
+                              <td className="py-4 px-2">{product.category}</td>
+                              <td className="py-4 px-2">₹{product.price.toLocaleString()}</td>
+                              <td className="py-4 px-2">
+                                <Badge variant={product.stock > 10 ? "default" : product.stock > 0 ? "secondary" : "destructive"}>
+                                  {product.stock} units
+                                </Badge>
+                              </td>
+                              <td className="py-4 px-2">
+                                <div className="flex space-x-2">
+                                  <Button variant="outline" size="sm" onClick={() => handleOpenEdit(product)}>
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700" onClick={() => handleDeleteProduct(product.id)}>
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {filteredProducts.length === 0 && (
+                        <p className="text-center py-8 text-muted-foreground">No products found in your inventory.</p>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
+
             <TabsContent value="analytics">
               <Card>
                 <CardHeader>
                   <CardTitle>Sales Analytics</CardTitle>
-                  <CardDescription>
-                    View your sales performance over time
-                  </CardDescription>
+                  <CardDescription>View your sales performance over time</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={salesData}
-                        margin={{
-                          top: 20,
-                          right: 30,
-                          left: 20,
-                          bottom: 5,
-                        }}
-                      >
+                      <BarChart data={salesData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
-                        <Tooltip 
-                          formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Sales']}
-                        />
+                        <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Sales']} />
                         <Bar dataKey="sales" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -412,33 +363,142 @@ const SellerDashboardContent = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
             <TabsContent value="orders">
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription>
-                    Manage and track your incoming orders
-                  </CardDescription>
+                  <CardDescription>Manage and track your incoming orders</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-center p-12">
-                    <div className="text-center">
-                      <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
-                      <h3 className="mt-4 text-lg font-semibold">Connect Orders Table</h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Your real orders from the Supabase database will appear here.
-                      </p>
+                  {orders.length === 0 ? (
+                    <div className="flex items-center justify-center p-12">
+                      <div className="text-center">
+                        <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
+                        <h3 className="mt-4 text-lg font-semibold">No orders yet</h3>
+                        <p className="mt-2 text-sm text-muted-foreground">Your real orders will appear here once received.</p>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-4 px-2">Order ID</th>
+                            <th className="text-left py-4 px-2">Customer</th>
+                            <th className="text-left py-4 px-2">Total</th>
+                            <th className="text-left py-4 px-2">Status</th>
+                            <th className="text-left py-4 px-2">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {orders.map((order) => (
+                            <tr key={order.id} className="border-b">
+                              <td className="py-4 px-2 font-medium">{order.id}</td>
+                              <td className="py-4 px-2">{order.customer_name}</td>
+                              <td className="py-4 px-2">₹{order.total_price.toLocaleString()}</td>
+                              <td className="py-4 px-2">
+                                <Badge className={getStatusColor(order.status)}>
+                                  {order.status}
+                                </Badge>
+                              </td>
+                              <td className="py-4 px-2">
+                                <Select value={order.status} onValueChange={(val: Order['status']) => handleUpdateOrderStatus(order.id, val)}>
+                                  <SelectTrigger className="h-8 w-32">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Pending">Pending</SelectItem>
+                                    <SelectItem value="Processing">Processing</SelectItem>
+                                    <SelectItem value="Shipped">Shipped</SelectItem>
+                                    <SelectItem value="Delivered">Delivered</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
+                <DialogDescription>Enter the details of the PC component here.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">Name</Label>
+                  <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="category" className="text-right">Category</Label>
+                  <Select value={formData.category} onValueChange={(val) => setFormData({ ...formData, category: val })}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CPU">CPU</SelectItem>
+                      <SelectItem value="GPU">GPU</SelectItem>
+                      <SelectItem value="Motherboard">Motherboard</SelectItem>
+                      <SelectItem value="RAM">RAM</SelectItem>
+                      <SelectItem value="Storage">Storage</SelectItem>
+                      <SelectItem value="Power Supply">Power Supply</SelectItem>
+                      <SelectItem value="Case">Case</SelectItem>
+                      <SelectItem value="Monitor">Monitor</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="price" className="text-right">Price (₹)</Label>
+                  <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="stock" className="text-right">Stock</Label>
+                  <Input id="stock" type="number" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} className="col-span-3" />
+                </div>
+                <DialogFooter>
+                  <Button type="submit">{editingProduct ? "Save Changes" : "Add Product"}</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </main>
       <Footer />
     </div>
   );
+};
+
+const StatsCard = ({ title, value, icon, change }: { title: string, value: string | number, icon: React.ReactNode, change: string }) => (
+  <Card className="hover-scale">
+    <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardTitle className="text-lg font-medium">{title}</CardTitle>
+      {icon}
+    </CardHeader>
+    <CardContent>
+      <div className="text-2xl font-bold">{value}</div>
+      <p className="text-sm text-green-600 flex items-center mt-1">
+        {change}
+        <TrendingUp className="h-4 w-4 ml-1" />
+      </p>
+    </CardContent>
+  </Card>
+);
+
+const getStatusColor = (status: Order['status']) => {
+  switch (status) {
+    case 'Delivered': return "bg-green-100 text-green-800";
+    case 'Shipped': return "bg-blue-100 text-blue-800";
+    case 'Processing': return "bg-amber-100 text-amber-800";
+    default: return "bg-gray-100 text-gray-800";
+  }
 };
 
 const SellerDashboard = () => {
