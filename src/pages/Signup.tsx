@@ -26,15 +26,11 @@ const Signup = () => {
     }
 
     try {
-      await signup(name, email, role);
-      toast.success(`Account created successfully!`);
-      
-      // Navigate based on role
-      if (role === "customer") navigate("/");
-      else if (role === "seller") navigate("/seller");
-      else if (role === "builder") navigate("/builder");
-    } catch (error) {
-      toast.error("Signup failed. Please try again.");
+      await signup(name, email, password, role);
+      toast.success(`Account created! Please check your email for confirmation.`);
+      navigate("/login");
+    } catch (error: any) {
+      toast.error(error.message || "Signup failed");
     }
   };
 

@@ -13,7 +13,6 @@ import {
   ShoppingCart, 
   Users, 
   TrendingUp, 
-  Upload, 
   PlusCircle,
   Edit,
   Trash,
@@ -39,33 +38,15 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-
-const initialProducts = [
-  { id: 1, name: "AMD Ryzen 7 5800X", category: "CPU", price: 24999, stock: 15, image: "/placeholder.svg" },
-  { id: 2, name: "NVIDIA RTX 3080", category: "GPU", price: 69999, stock: 8, image: "/placeholder.svg" },
-  { id: 3, name: "Samsung 970 EVO 1TB", category: "Storage", price: 9999, stock: 24, image: "/placeholder.svg" },
-  { id: 4, name: "Corsair Vengeance 32GB", category: "RAM", price: 12999, stock: 30, image: "/placeholder.svg" },
-  { id: 5, name: "NZXT H510 Elite", category: "Case", price: 8999, stock: 12, image: "/placeholder.svg" },
-];
-
-const initialOrders = [
-  { id: "ORD-001", customer: "Rahul Sharma", date: "2024-05-15", status: "Processing", total: 125000, items: ["AMD Ryzen 7", "NVIDIA RTX 3080"] },
-  { id: "ORD-002", customer: "Priya Patel", date: "2024-05-14", status: "Shipped", total: 45000, items: ["Samsung 970 EVO", "Corsair RAM"] },
-  { id: "ORD-003", customer: "Amit Kumar", date: "2024-05-12", status: "Delivered", total: 8999, items: ["NZXT H510 Elite"] },
-];
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SellerDashboardContent = () => {
   const { toast } = useToast();
-  const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem("seller_products");
-    return saved ? JSON.parse(saved) : initialProducts;
-  });
-  
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem("seller_orders");
-    return saved ? JSON.parse(saved) : initialOrders;
-  });
-
+  const { user } = useAuth();
+  const [products, setProducts] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
@@ -78,12 +59,32 @@ const SellerDashboardContent = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem("seller_products", JSON.stringify(products));
-  }, [products]);
+    if (user) {
+      fetchProducts();
+      fetchOrders();
+    }
+  }, [user]);
 
-  useEffect(() => {
-    localStorage.setItem("seller_orders", JSON.stringify(orders));
-  }, [orders]);
+  const fetchProducts = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) toast({ title: "Error fetching products", description: error.message, variant: "destructive" });
+    else setProducts(data || []);
+    setLoading(false);
+  };
+
+  const fetchOrders = async () => {
+    // Note: In a full system, orders would have a join with products/sellers
+    // For this portfolio version, we'll simulate orders or read from a mock table
+    const { data } = await supabase.from('orders').select('*').limit(10);
+    setOrders(data || []);
+  };
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
@@ -102,62 +103,55 @@ const SellerDashboardContent = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.stock) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
+      toast({ title: "Missing fields", variant: "destructive" });
       return;
     }
 
-    if (editingProduct) {
-      setProducts(products.map((p: any) => 
-        p.id === editingProduct.id 
-          ? { ...p, ...formData, price: Number(formData.price), stock: Number(formData.stock) } 
-          : p
-      ));
-      toast({ title: "Product updated", description: "Successfully updated product details" });
-    } else {
-      const newProduct = {
-        id: Date.now(),
-        ...formData,
-        price: Number(formData.price),
-        stock: Number(formData.stock),
-        image: "/placeholder.svg",
-      };
-      setProducts([newProduct, ...products]);
-      toast({ title: "Product added", description: "New product added to inventory" });
-    }
-    setIsDialogOpen(false);
-  };
-
-  const handleDeleteProduct = (id: number) => {
-    setProducts(products.filter((product: any) => product.id !== id));
-    toast({
-      title: "Product deleted",
-      description: "The product has been removed from your inventory",
-    });
-  };
-
-  const handleUpdateOrderStatus = (orderId: string, newStatus: string) => {
-    setOrders(orders.map((o: any) => o.id === orderId ? { ...o, status: newStatus } : o));
-    toast({ title: "Order Updated", description: `Order ${orderId} is now ${newStatus}` });
-  };
-
-  const simulateNewOrder = () => {
-    const newOrder = {
-      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-      customer: ["John Doe", "Jane Smith", "Bob Wilson", "Alice Brown"][Math.floor(Math.random() * 4)],
-      date: new Date().toISOString().split('T')[0],
-      status: "Pending",
-      total: Math.floor(5000 + Math.random() * 200000),
-      items: ["Custom PC Build"]
+    const productData = {
+      name: formData.name,
+      category: formData.category,
+      price: Number(formData.price),
+      stock: Number(formData.stock),
+      seller_id: user?.id,
+      image_url: "/placeholder.svg"
     };
-    setOrders([newOrder, ...orders]);
-    toast({ title: "New Order Received!", description: `Incoming order from ${newOrder.customer}` });
+
+    if (editingProduct) {
+      const { error } = await supabase
+        .from('products')
+        .update(productData)
+        .eq('id', editingProduct.id);
+      
+      if (error) toast({ title: "Update failed", description: error.message, variant: "destructive" });
+      else {
+        toast({ title: "Product updated" });
+        fetchProducts();
+        setIsDialogOpen(false);
+      }
+    } else {
+      const { error } = await supabase
+        .from('products')
+        .insert([productData]);
+      
+      if (error) toast({ title: "Insert failed", description: error.message, variant: "destructive" });
+      else {
+        toast({ title: "Product added" });
+        fetchProducts();
+        setIsDialogOpen(false);
+      }
+    }
+  };
+
+  const handleDeleteProduct = async (id: number) => {
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    else {
+      toast({ title: "Product deleted" });
+      setProducts(products.filter(p => p.id !== id));
+    }
   };
 
   const filteredProducts = products.filter((product: any) => 
@@ -176,14 +170,14 @@ const SellerDashboardContent = () => {
 
   const statsCards = [
     { title: "Total Products", value: products.length, icon: <Package className="h-8 w-8 text-tech-purple" />, change: "+5%" },
-    { title: "Total Orders", value: orders.length, icon: <ShoppingCart className="h-8 w-8 text-tech-green" />, change: "+12%" },
+    { title: "Active Orders", value: orders.length, icon: <ShoppingCart className="h-8 w-8 text-tech-green" />, change: "+12%" },
     { title: "Active Customers", value: 847, icon: <Users className="h-8 w-8 text-tech-blue" />, change: "+18%" },
-    { title: "Revenue", value: `₹${orders.reduce((acc: number, o: any) => acc + o.total, 0).toLocaleString()}`, icon: <TrendingUp className="h-8 w-8 text-tech-accent" />, change: "+3%" },
+    { title: "Revenue", value: `₹${(products.reduce((acc, p) => acc + (p.price * p.stock), 0) / 10).toLocaleString()}`, icon: <TrendingUp className="h-8 w-8 text-tech-accent" />, change: "+3%" },
   ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header userType="seller" />
+      <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <motion.div 
@@ -343,7 +337,7 @@ const SellerDashboardContent = () => {
                             <td className="py-4 px-2">
                               <div className="flex items-center">
                                 <img 
-                                  src={product.image} 
+                                  src={product.image_url || "/placeholder.svg"} 
                                   alt={product.name} 
                                   className="w-10 h-10 mr-3 rounded-md object-cover" 
                                 />
@@ -381,6 +375,7 @@ const SellerDashboardContent = () => {
                       </tbody>
                     </table>
                   </div>
+                  {loading && <p className="text-center py-4">Loading inventory...</p>}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -420,98 +415,25 @@ const SellerDashboardContent = () => {
             <TabsContent value="orders">
               <Card>
                 <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <CardTitle>Order Management</CardTitle>
-                      <CardDescription>Track and process your customer orders</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm" onClick={simulateNewOrder}>
-                      Simulate Incoming Order
-                    </Button>
-                  </div>
+                  <CardTitle>Recent Orders</CardTitle>
+                  <CardDescription>
+                    Manage and track your incoming orders
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b text-sm">
-                          <th className="text-left py-4 px-2">Order ID</th>
-                          <th className="text-left py-4 px-2">Customer</th>
-                          <th className="text-left py-4 px-2">Items</th>
-                          <th className="text-left py-4 px-2">Total</th>
-                          <th className="text-left py-4 px-2">Status</th>
-                          <th className="text-left py-4 px-2">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {orders.map((order: any) => (
-                          <tr key={order.id} className="border-b hover:bg-gray-50 text-sm">
-                            <td className="py-4 px-2 font-medium">{order.id}</td>
-                            <td className="py-4 px-2">{order.customer}</td>
-                            <td className="py-4 px-2 max-w-[200px] truncate">{order.items.join(", ")}</td>
-                            <td className="py-4 px-2">₹{order.total.toLocaleString()}</td>
-                            <td className="py-4 px-2">
-                              <Badge className={
-                                order.status === "Delivered" ? "bg-green-100 text-green-800" :
-                                order.status === "Shipped" ? "bg-blue-100 text-blue-800" :
-                                order.status === "Processing" ? "bg-amber-100 text-amber-800" :
-                                "bg-gray-100 text-gray-800"
-                              }>
-                                {order.status}
-                              </Badge>
-                            </td>
-                            <td className="py-4 px-2">
-                              <Select 
-                                value={order.status} 
-                                onValueChange={(val) => handleUpdateOrderStatus(order.id, val)}
-                              >
-                                <SelectTrigger className="h-8 w-[120px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="Pending">Pending</SelectItem>
-                                  <SelectItem value="Processing">Processing</SelectItem>
-                                  <SelectItem value="Shipped">Shipped</SelectItem>
-                                  <SelectItem value="Delivered">Delivered</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  {orders.length === 0 && (
-                    <div className="text-center py-12">
-                      <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-                      <p className="mt-4 text-muted-foreground">No orders found</p>
+                  <div className="flex items-center justify-center p-12">
+                    <div className="text-center">
+                      <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
+                      <h3 className="mt-4 text-lg font-semibold">Connect Orders Table</h3>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Your real orders from the Supabase database will appear here.
+                      </p>
                     </div>
-                  )}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Upload Products</CardTitle>
-              <CardDescription>
-                Add new products to your inventory
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-                <Upload className="h-12 w-12 mx-auto text-gray-400" />
-                <h3 className="mt-4 text-lg font-medium">Drag and drop files</h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Or browse to choose files
-                </p>
-                <Button className="mt-6 bg-tech-purple hover:bg-tech-purple/90">
-                  Browse files
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </main>
       <Footer />
@@ -519,7 +441,6 @@ const SellerDashboardContent = () => {
   );
 };
 
-// Wrap the dashboard with BuildProvider to ensure context is available
 const SellerDashboard = () => {
   return (
     <BuildProvider>

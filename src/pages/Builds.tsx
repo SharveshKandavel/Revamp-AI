@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { Heart, Share2, Search, Filter, Star, Clock, DollarSign, User } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 const staticBuilds = [
   {
@@ -108,14 +109,48 @@ const BuildsContent = () => {
   const [sortBy, setSortBy] = useState("latest");
   const [activeTab, setActiveTab] = useState("community");
   const [savedBuilds, setSavedBuilds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("saved_builds") || "[]");
-    setSavedBuilds(saved);
-  }, []);
+    if (activeTab === "my-builds") {
+      fetchMyBuilds();
+    }
+  }, [activeTab, user]);
 
-  const handleLike = (id: number) => {
-    toast.success("Build added to your favorites!");
+  const fetchMyBuilds = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('builds')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      toast.error("Failed to fetch your builds");
+    } else {
+      setSavedBuilds(data || []);
+    }
+    setLoading(false);
+  };
+
+  const handleLike = async (build: any) => {
+    if (activeTab === "community") {
+      toast.success("Build added to your favorites!");
+      return;
+    }
+
+    const { error } = await supabase
+      .from('builds')
+      .update({ likes: (build.likes || 0) + 1 })
+      .eq('id', build.id);
+    
+    if (!error) {
+      setSavedBuilds(savedBuilds.map(b => b.id === build.id ? { ...b, likes: (b.likes || 0) + 1 } : b));
+      toast.success("Build liked!");
+    } else {
+      toast.error("Failed to like build");
+    }
   };
 
   const handleShare = (title: string) => {
@@ -132,7 +167,14 @@ const BuildsContent = () => {
 
   const displayBuilds = activeTab === "community" 
     ? staticBuilds 
-    : savedBuilds.filter(b => b.userId === user?.id);
+    : savedBuilds.map(b => ({
+        ...b,
+        price: b.total_price,
+        author: user?.name || "Me",
+        difficulty: b.performance === 'High-End' ? 'Advanced' : 'Intermediate',
+        category: 'Custom',
+        specs: b.parts ? Object.values(b.parts).filter((p: any) => p).map((p: any) => p.name).slice(0, 3) : []
+      }));
 
   const filteredBuilds = displayBuilds.filter(build => {
     const matchesSearch = build.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -220,7 +262,9 @@ const BuildsContent = () => {
 
           {/* Builds Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBuilds.map((build, index) => (
+            {loading ? (
+              <div className="col-span-full text-center py-12">Loading builds...</div>
+            ) : filteredBuilds.map((build, index) => (
               <motion.div
                 key={build.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -263,14 +307,14 @@ const BuildsContent = () => {
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center gap-2">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span>{build.rating}</span>
+                          <span>{build.rating || "5.0"}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Heart className="h-4 w-4" />
-                          <span>{build.likes}</span>
+                          <span>{build.likes || 0}</span>
                         </div>
                         <div className="flex items-center gap-2 font-bold text-tech-dark">
-                          <span>₹{build.price.toLocaleString()}</span>
+                          <span>₹{Number(build.price).toLocaleString()}</span>
                         </div>
                       </div>
                       
@@ -280,7 +324,7 @@ const BuildsContent = () => {
                           <span>{build.author}</span>
                         </div>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleLike(build.id)}>
+                          <Button variant="outline" size="sm" onClick={() => handleLike(build)}>
                             <Heart className="h-4 w-4" />
                           </Button>
                           <Button variant="outline" size="sm" onClick={() => handleShare(build.title)}>
@@ -298,7 +342,7 @@ const BuildsContent = () => {
             ))}
           </div>
 
-          {filteredBuilds.length === 0 && (
+          {filteredBuilds.length === 0 && !loading && (
             <div className="text-center py-24 bg-white rounded-xl shadow-sm border border-dashed border-gray-200">
               <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">

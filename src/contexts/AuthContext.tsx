@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { supabase } from "@/lib/supabase";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 export type UserRole = "customer" | "seller" | "builder";
 
@@ -14,8 +16,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, role: UserRole) => Promise<void>;
-  signup: (name: string, email: string, role: UserRole) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   logout: () => void;
 }
 
@@ -26,50 +28,78 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage for existing session
-    const savedUser = localStorage.getItem("auth_user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    // Get initial session
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await fetchUserData(session.user);
+      }
+      setIsLoading(false);
+    };
+
+    initAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        await fetchUserData(session.user);
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, role: UserRole) => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  const fetchUserData = async (supabaseUser: SupabaseUser) => {
+    // In a real app, you'd store roles in a 'profiles' table
+    // For now, we'll use user_metadata or fallback to customer
+    const { name, role } = supabaseUser.user_metadata;
     
-    const mockUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-      email,
-      role,
-    };
-    
-    setUser(mockUser);
-    localStorage.setItem("auth_user", JSON.stringify(mockUser));
-    setIsLoading(false);
+    setUser({
+      id: supabaseUser.id,
+      name: name || supabaseUser.email?.split('@')[0] || "User",
+      email: supabaseUser.email || "",
+      role: (role as UserRole) || "customer",
+    });
   };
 
-  const signup = async (name: string, email: string, role: UserRole) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    const mockUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      role,
-    };
+      password,
+    });
     
-    setUser(mockUser);
-    localStorage.setItem("auth_user", JSON.stringify(mockUser));
-    setIsLoading(false);
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
   };
 
-  const logout = () => {
+  const signup = async (name: string, email: string, password: string, role: UserRole) => {
+    setIsLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          role,
+        },
+      },
+    });
+
+    if (error) {
+      setIsLoading(false);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem("auth_user");
   };
 
   return (
