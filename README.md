@@ -35,3 +35,15 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Deployment
+
+This project is configured for easy deployment on **Vercel**:
+
+1. Push your code to GitHub (already completed).
+2. Go to [Vercel](https://vercel.com/new).
+3. Import the `Revamp-AI` repository.
+4. Vercel will automatically detect Vite and deploy your site.
+
+Every push to the `main` branch will trigger an automatic redeploy.
+
