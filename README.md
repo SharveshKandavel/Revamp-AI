@@ -21,6 +21,18 @@ Built with technical depth and scalability in mind, this project demonstrates a 
 
 ---
 
+## 🕹️ Quick Demo Access
+
+To explore the different professional roles without creating an account, use these test credentials:
+
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Customer** | `test@customer.com` | `password123` |
+| **Seller** | `test@seller.com` | `password123` |
+| **Professional Builder** | `test@builder.com` | `password123` |
+
+---
+
 ## 🌟 Key Technical Features
 
 ### 1. Secure Multi-Tenant Architecture
