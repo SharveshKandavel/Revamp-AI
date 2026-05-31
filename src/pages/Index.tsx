@@ -16,6 +16,8 @@ import BuildVisualizer3D from "@/components/BuildVisualizer3D";
 import PowerConsumptionCalculator from "@/components/PowerConsumptionCalculator";
 import { motion } from "framer-motion";
 import { useBuild } from "@/contexts/BuildContext";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart, Wrench } from "lucide-react";
 
 const MainContent = () => {
   const { userType, setUserType } = useBuild();
@@ -92,14 +94,29 @@ const MainContent = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="p-6 bg-white rounded-lg shadow-md"
+              className="p-8 bg-white rounded-xl shadow-lg border border-gray-100 text-center"
             >
-              <h2 className="text-2xl font-bold mb-4">Seller Dashboard</h2>
-              <p className="text-gray-600 mb-6">
-                As a seller, you can upload your products and manage your inventory here.
+              <div className="w-20 h-20 bg-tech-purple/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShoppingCart className="w-10 h-10 text-tech-purple" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-tech-dark">Seller Dashboard</h2>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                Manage your PC parts inventory, track sales, and connect with builders across the platform.
               </p>
-              <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                <p className="text-gray-500">Seller functionality coming soon!</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={() => window.location.href = "/seller"}
+                  className="bg-tech-purple hover:bg-tech-purple/90 px-8 py-6 text-lg"
+                >
+                  Go to Seller Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setUserType(null)}
+                  className="px-8 py-6 text-lg"
+                >
+                  Change User Type
+                </Button>
               </div>
             </motion.div>
           )}
@@ -109,14 +126,29 @@ const MainContent = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="p-6 bg-white rounded-lg shadow-md"
+              className="p-8 bg-white rounded-xl shadow-lg border border-gray-100 text-center"
             >
-              <h2 className="text-2xl font-bold mb-4">PC Builder Dashboard</h2>
-              <p className="text-gray-600 mb-6">
-                As a PC builder, you can view incoming build requests and manage your profile here.
+              <div className="w-20 h-20 bg-tech-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Wrench className="w-10 h-10 text-tech-blue" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4 text-tech-dark">PC Builder Dashboard</h2>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                Access your build queue, view client requests, and manage your professional assembly profile.
               </p>
-              <div className="p-8 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                <p className="text-gray-500">Builder functionality coming soon!</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={() => window.location.href = "/builder"}
+                  className="bg-tech-blue hover:bg-tech-blue/90 px-8 py-6 text-lg"
+                >
+                  Go to Builder Dashboard
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => setUserType(null)}
+                  className="px-8 py-6 text-lg"
+                >
+                  Change User Type
+                </Button>
               </div>
             </motion.div>
           )}

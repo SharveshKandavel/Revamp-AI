@@ -58,7 +58,7 @@ const BuildSummary: React.FC = () => {
 
   const performanceLevel = calculatePerformanceLevel();
 
-  const handleSaveBuild = () => {
+  const handleSaveBuild = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to save your build", {
         description: "Join Revamp AI to keep your custom configurations."
@@ -66,28 +66,54 @@ const BuildSummary: React.FC = () => {
       return;
     }
 
-    const savedBuilds = JSON.parse(localStorage.getItem("saved_builds") || "[]");
-    const newBuild = {
-      id: Date.now(),
-      userId: user?.id,
-      title: `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`,
-      description: `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`,
-      price: totalPrice,
-      parts: selectedParts,
-      performance: performanceLevel.level,
-      date: new Date().toISOString(),
-      likes: 0,
-      author: user?.name || "Guest",
-      rating: 5.0,
-      difficulty: performanceLevel.level === 'High-End' ? 'Advanced' : 'Intermediate',
-      category: 'Custom',
-      specs: [selectedParts.GPU?.name, selectedParts.CPU?.name].filter(Boolean)
-    };
+    try {
+      const buildData = {
+        user_id: user?.id,
+        title: `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`,
+        description: `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`,
+        total_price: totalPrice,
+        parts: selectedParts,
+        performance: performanceLevel.level,
+        is_public: true
+      };
 
-    localStorage.setItem("saved_builds", JSON.stringify([newBuild, ...savedBuilds]));
-    toast.success("Build saved successfully!", {
-      description: "You can view your saved builds in the 'Builds' showcase."
-    });
+      const { data, error } = await supabase
+        .from('builds')
+        .insert([buildData])
+        .select();
+
+      if (error) throw error;
+
+      toast.success("Build saved to cloud!", {
+        description: "You can view your saved builds in your dashboard."
+      });
+    } catch (error: any) {
+      console.error("Error saving build:", error.message);
+      
+      // Fallback to local storage if supabase fails
+      const savedBuilds = JSON.parse(localStorage.getItem("saved_builds") || "[]");
+      const newBuild = {
+        id: Date.now(),
+        userId: user?.id,
+        title: `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`,
+        description: `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`,
+        price: totalPrice,
+        parts: selectedParts,
+        performance: performanceLevel.level,
+        date: new Date().toISOString(),
+        likes: 0,
+        author: user?.name || "Guest",
+        rating: 5.0,
+        difficulty: performanceLevel.level === 'High-End' ? 'Advanced' : 'Intermediate',
+        category: 'Custom',
+        specs: [selectedParts.GPU?.name, selectedParts.CPU?.name].filter(Boolean)
+      };
+
+      localStorage.setItem("saved_builds", JSON.stringify([newBuild, ...savedBuilds]));
+      toast.info("Build saved locally", {
+        description: "We saved it to your browser as a backup."
+      });
+    }
   };
 
   // Generate affiliate links for products
@@ -194,34 +220,43 @@ const BuildSummary: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
-          <div>
-            <div className="text-sm text-gray-500">Build Performance</div>
-            <div className={`font-medium ${performanceLevel.color}`}>
-              {performanceLevel.level}
+        <div className="mt-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm text-gray-500">Build Performance</div>
+              <div className={`font-medium ${performanceLevel.color}`}>
+                {performanceLevel.level}
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <div 
+                className={`${
+                  compatibilityResult.compatible 
+                    ? "text-green-600 bg-green-50" 
+                    : "text-red-600 bg-red-50"
+                } px-3 py-1 rounded-full flex items-center gap-1.5 text-sm font-medium`}
+              >
+                {compatibilityResult.compatible ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>Compatible</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldAlert className="w-4 h-4" />
+                    <span>Incompatible</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div 
-              className={`${
-                compatibilityResult.compatible 
-                  ? "text-green-600 bg-green-50" 
-                  : "text-red-600 bg-red-50"
-              } px-3 py-1 rounded-full flex items-center gap-1.5 text-sm font-medium`}
-            >
-              {compatibilityResult.compatible ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>Compatible</span>
-                </>
-              ) : (
-                <>
-                  <ShieldAlert className="w-4 h-4" />
-                  <span>Compatibility Issues</span>
-                </>
-              )}
+          
+          {!compatibilityResult.compatible && compatibilityResult.message && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 flex gap-2">
+              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{compatibilityResult.message}</span>
             </div>
-          </div>
+          )}
         </div>
       </CardContent>
 

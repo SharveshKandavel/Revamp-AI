@@ -117,15 +117,15 @@ function PCCase({ rotate, selectedParts }: { rotate: boolean, selectedParts: any
       </group>
       
       {/* Internal components */}
-      <Motherboard />
-      <GPU />
-      <RAMSticks />
-      <PowerSupply />
+      {selectedParts.Motherboard && <Motherboard />}
+      {selectedParts.GPU && <GPU />}
+      {selectedParts.RAM && <RAMSticks />}
+      {selectedParts.PowerSupply && <PowerSupply />}
       
       {/* Side panel glass */}
       <mesh position={[-1.01, 0, 0]}>
         <boxGeometry args={[0.02, 2.9, 0.9]} />
-        <meshStandardMaterial color="#79b8de" transparent opacity={0.3} />
+        <meshStandardMaterial color={selectedParts.Case ? "#79b8de" : "#79b8de"} transparent opacity={0.3} />
       </mesh>
     </mesh>
   );
