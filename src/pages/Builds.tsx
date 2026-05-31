@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Heart, Share2, Search, Star, User, RefreshCw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Build } from "@/types/database";
 
@@ -72,32 +72,43 @@ const staticBuilds: Build[] = [
 
 const BuildsContent = () => {
   const { user } = useAuth();
+  const { selectPart, setPurpose, setBudget } = useBuild();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [activeTab, setActiveTab] = useState("community");
-  const [savedBuilds, setSavedBuilds] = useState<Build[]>([]);
+  const [communityBuilds, setCommunityBuilds] = useState<Build[]>([]);
+  const [myBuilds, setMyBuilds] = useState<Build[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (activeTab === "my-builds" && user) {
-      fetchMyBuilds();
-    }
+    fetchBuilds();
   }, [activeTab, user]);
 
-  const fetchMyBuilds = async () => {
-    if (!user) return;
+  const fetchBuilds = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const { data, error } = await supabase
-        .from('builds')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setSavedBuilds(data || []);
+      if (activeTab === "community") {
+        const { data, error } = await supabase
+          .from('builds')
+          .select('*')
+          .eq('is_public', true)
+          .order('likes', { ascending: false });
+        
+        if (error) throw error;
+        setCommunityBuilds(data || []);
+      } else if (user) {
+        const { data, error } = await supabase
+          .from('builds')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        setMyBuilds(data || []);
+      }
     } catch (err: any) {
       setError(err.message || "Failed to fetch builds");
       toast.error("Database connection error");
@@ -107,11 +118,6 @@ const BuildsContent = () => {
   };
 
   const handleLike = async (build: Build) => {
-    if (activeTab === "community") {
-      toast.success("Build added to your favorites!");
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from('builds')
@@ -119,10 +125,36 @@ const BuildsContent = () => {
         .eq('id', build.id);
       
       if (error) throw error;
-      setSavedBuilds(savedBuilds.map(b => b.id === build.id ? { ...b, likes: (b.likes || 0) + 1 } : b));
+      
+      const updateFn = (b: Build) => b.id === build.id ? { ...b, likes: (b.likes || 0) + 1 } : b;
+      if (activeTab === "community") setCommunityBuilds(communityBuilds.map(updateFn));
+      else setMyBuilds(myBuilds.map(updateFn));
+      
       toast.success("Build liked!");
     } catch (err: any) {
       toast.error("Failed to update likes");
+    }
+  };
+
+  const handleRemix = (build: Build) => {
+    try {
+      // Load parts into context
+      if (build.parts) {
+        Object.entries(build.parts).forEach(([category, part]: [string, any]) => {
+          if (part) selectPart(category as any, part);
+        });
+      }
+      
+      // Set initial state
+      setPurpose("Gaming"); // Default to gaming for now
+      setBudget(build.total_price || build.price);
+      
+      toast.success("Build remixed!", {
+        description: "Configuration loaded into your builder workspace."
+      });
+      navigate("/");
+    } catch (err) {
+      toast.error("Failed to remix build");
     }
   };
 
@@ -139,8 +171,14 @@ const BuildsContent = () => {
   };
 
   const displayBuilds: Build[] = activeTab === "community" 
-    ? staticBuilds 
-    : savedBuilds.map(b => ({
+    ? communityBuilds.map(b => ({
+        ...b,
+        author: "Tech Enthusiast",
+        difficulty: b.performance === 'High-End' ? 'Advanced' : 'Intermediate',
+        category: 'Community',
+        specs: b.parts ? Object.values(b.parts).filter((p: any) => p).map((p: any) => p.name).slice(0, 3) : []
+      }))
+    : myBuilds.map(b => ({
         ...b,
         author: user?.name || "Me",
         difficulty: b.performance === 'High-End' ? 'Advanced' : 'Intermediate',
@@ -170,7 +208,7 @@ const BuildsContent = () => {
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-tech-dark mb-2">Build Showcase</h1>
               <p className="text-lg text-gray-600">
-                {activeTab === "community" ? "Discover amazing PC builds" : "Your personal collection"}
+                {activeTab === "community" ? "Discover amazing PC builds from the community" : "Your personal cloud-synced collection"}
               </p>
             </div>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
@@ -194,6 +232,7 @@ const BuildsContent = () => {
                   <SelectItem value="gaming">Gaming</SelectItem>
                   <SelectItem value="workstation">Workstation</SelectItem>
                   <SelectItem value="creator">Creator</SelectItem>
+                  <SelectItem value="community">Community</SelectItem>
                   <SelectItem value="custom">Custom</SelectItem>
                 </SelectContent>
               </Select>
@@ -205,7 +244,7 @@ const BuildsContent = () => {
               <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
               <h3 className="text-lg font-semibold">Connection Error</h3>
               <p className="text-muted-foreground mb-6">{error}</p>
-              <Button onClick={fetchMyBuilds} variant="outline" className="gap-2">
+              <Button onClick={fetchBuilds} variant="outline" className="gap-2">
                 <RefreshCw className="w-4 h-4" /> Retry
               </Button>
             </Card>
@@ -214,10 +253,18 @@ const BuildsContent = () => {
               {isLoading ? (
                 <div className="col-span-full text-center py-24">
                   <RefreshCw className="w-10 h-10 animate-spin mx-auto text-tech-purple mb-4" />
-                  <p className="text-muted-foreground">Fetching your builds from the cloud...</p>
+                  <p className="text-muted-foreground">Syncing with global build repository...</p>
                 </div>
               ) : filteredBuilds.map((build, index) => (
-                <BuildCard key={build.id} build={build} index={index} onLike={() => handleLike(build)} onShare={() => handleShare(build.title)} isSavedTab={activeTab === 'my-builds'} />
+                <BuildCard 
+                  key={build.id} 
+                  build={build} 
+                  index={index} 
+                  onLike={() => handleLike(build)} 
+                  onShare={() => handleShare(build.title)} 
+                  onRemix={() => handleRemix(build)}
+                  isSavedTab={activeTab === 'my-builds'} 
+                />
               ))}
             </div>
           )}
@@ -227,7 +274,7 @@ const BuildsContent = () => {
               <Search className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No builds found</h3>
               <p className="text-gray-500 max-w-xs mx-auto">
-                {activeTab === "my-builds" ? "Start building your dream PC and click 'Save Build'!" : "Try adjusting your filters."}
+                {activeTab === "my-builds" ? "Start building your dream PC and click 'Save Build'!" : "Be the first to share an amazing build with the community!"}
               </p>
             </div>
           )}
@@ -238,7 +285,14 @@ const BuildsContent = () => {
   );
 };
 
-const BuildCard = ({ build, index, onLike, onShare, isSavedTab }: { build: Build, index: number, onLike: () => void, onShare: () => void, isSavedTab: boolean }) => (
+const BuildCard = ({ build, index, onLike, onShare, onRemix, isSavedTab }: { 
+  build: Build, 
+  index: number, 
+  onLike: () => void, 
+  onShare: () => void, 
+  onRemix: () => void,
+  isSavedTab: boolean 
+}) => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.05 }}>
     <Card className="group hover:shadow-lg transition-all duration-300 h-full flex flex-col">
       <div className="aspect-video bg-gray-200 rounded-t-lg overflow-hidden relative">
@@ -264,11 +318,14 @@ const BuildCard = ({ build, index, onLike, onShare, isSavedTab }: { build: Build
             <div className="flex items-center gap-2 font-bold text-tech-dark"><span>₹{Number(build.total_price || build.price).toLocaleString()}</span></div>
           </div>
           <div className="flex items-center justify-between pt-2 border-t mt-auto">
-            <div className="flex items-center gap-1.5 text-xs text-gray-500"><User className="w-3 h-3" /><span>{build.author}</span></div>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 line-clamp-1 flex-1">
+              <User className="w-3 h-3" />
+              <span>{build.author}</span>
+            </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={onLike}><Heart className="h-4 w-4" /></Button>
-              <Button variant="outline" size="sm" onClick={onShare}><Share2 className="h-4 w-4" /></Button>
-              <Button size="sm" className="bg-tech-accent hover:bg-tech-accent/90">View</Button>
+              <Button variant="outline" size="sm" onClick={onLike} className="h-8 w-8 p-0"><Heart className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" onClick={onShare} className="h-8 w-8 p-0"><Share2 className="h-4 w-4" /></Button>
+              <Button size="sm" onClick={onRemix} className="bg-tech-accent hover:bg-tech-accent/90 h-8">Remix</Button>
             </div>
           </div>
         </div>
