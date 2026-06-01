@@ -1,9 +1,21 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Cpu, ShoppingCart, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth, UserRole } from "@/contexts/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface UserTypeSelectorProps {
   onSelectUserType: (userType: string) => void;
@@ -47,6 +59,9 @@ const UserTypeCard: React.FC<UserTypeCardProps> = ({
 
 const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType }) => {
   const navigate = useNavigate();
+  const { user, updateRole, isAuthenticated } = useAuth();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingType, setPendingType] = useState<{ type: string; route: string | null } | null>(null);
 
   const userTypes = [
     {
@@ -73,10 +88,39 @@ const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType })
   ];
 
   const handleUserTypeSelect = (userType: string, route: string | null) => {
+    if (userType === 'seller') {
+      setPendingType({ type: userType, route });
+      setShowConfirm(true);
+    } else {
+      executeUserTypeSelect(userType, route);
+    }
+  };
+
+  const executeUserTypeSelect = async (userType: string, route: string | null) => {
+    // If authenticated, update the actual user role in Supabase
+    if (isAuthenticated) {
+      try {
+        await updateRole(userType as UserRole);
+        toast.success(`Role updated to ${userType}`);
+      } catch (err) {
+        console.error("Failed to update role in database:", err);
+      }
+    }
+    
+    // Update local session state
     onSelectUserType(userType);
+    
     if (route) {
       navigate(route);
     }
+  };
+
+  const confirmSwitch = () => {
+    if (pendingType) {
+      executeUserTypeSelect(pendingType.type, pendingType.route);
+    }
+    setShowConfirm(false);
+    setPendingType(null);
   };
 
   return (
@@ -86,16 +130,37 @@ const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType })
         How would you like to use Revamp AI?
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {userTypes.map((userType) => (
+        {userTypes.map((type) => (
           <UserTypeCard
-            key={userType.type}
-            title={userType.title}
-            description={userType.description}
-            icon={userType.icon}
-            onClick={() => handleUserTypeSelect(userType.type, userType.route)}
+            key={type.type}
+            title={type.title}
+            description={type.description}
+            icon={type.icon}
+            onClick={() => handleUserTypeSelect(type.type, type.route)}
           />
         ))}
       </div>
+
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch to Parts Seller Account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to switch your account type to Parts Seller? 
+              This will give you access to the inventory management dashboard and sales tools.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingType(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmSwitch}
+              className="bg-tech-purple hover:bg-tech-purple/90"
+            >
+              Confirm & Switch
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

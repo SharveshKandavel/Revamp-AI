@@ -89,6 +89,21 @@ const MainContent = () => {
               <CompatibilityCheck />
               <BuildSummary />
               <BuildOptions />
+              
+              <motion.div 
+                className="mt-12 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                <Button 
+                  variant="outline" 
+                  onClick={() => setUserType(null)}
+                  className="px-8 py-2 text-gray-500 hover:text-tech-purple transition-colors"
+                >
+                  Change User Type
+                </Button>
+              </motion.div>
             </>
           )}
 
