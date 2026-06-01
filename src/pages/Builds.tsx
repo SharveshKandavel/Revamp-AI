@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Build } from "@/types/database";
+import { useBuildStore } from "@/store/useBuildStore";
 
 const staticBuilds: Build[] = [
   {
@@ -27,7 +28,7 @@ const staticBuilds: Build[] = [
     likes: 247,
     created_at: "2024-01-15",
     author: "TechBuilder_Pro",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&q=80&w=800",
     category: "Gaming",
     specs: ["RTX 4080", "i7-13700K", "32GB DDR5"],
     difficulty: "Advanced",
@@ -44,7 +45,7 @@ const staticBuilds: Build[] = [
     likes: 189,
     created_at: "2024-01-12",
     author: "BudgetBuilder",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&q=80&w=800",
     category: "Workstation",
     specs: ["GTX 1660 Super", "Ryzen 5 5600", "16GB DDR4"],
     difficulty: "Beginner",
@@ -61,7 +62,7 @@ const staticBuilds: Build[] = [
     likes: 312,
     created_at: "2024-01-10",
     author: "StreamMaster",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&q=80&w=800",
     category: "Creator",
     specs: ["RTX 4070", "Ryzen 7 7700X", "32GB DDR5"],
     difficulty: "Intermediate",
@@ -314,7 +315,7 @@ const BuildCard = ({ build, index, onLike, onShare, onRemix, isSavedTab }: {
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span>{build.rating || "5.0"}</span></div>
             <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>{build.likes || 0}</span></div>
-            <div className="flex items-center gap-2 font-bold text-tech-dark"><span>₹{Number(build.total_price || build.price).toLocaleString()}</span></div>
+            <div className="flex items-center gap-2 font-bold text-tech-dark"><span>₹{(Number(build.total_price) || Number(build.price) || 0).toLocaleString()}</span></div>
           </div>
           <div className="flex items-center justify-between pt-2 border-t mt-auto">
             <div className="flex items-center gap-1.5 text-xs text-gray-500 line-clamp-1 flex-1">
