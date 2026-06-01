@@ -1,12 +1,12 @@
 
 import React from "react";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore } from "@/store/useBuildStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 
 const CompatibilityCheck: React.FC = () => {
-  const { selectedParts, compatibilityResult } = useBuild();
+  const { selectedParts, compatibilityResult } = useBuildStore();
 
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;

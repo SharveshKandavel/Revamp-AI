@@ -2,7 +2,7 @@
 import React, { Suspense, useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { useBuild } from '@/contexts/BuildContext';
+import { useBuildStore } from '@/store/useBuildStore';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Monitor, RotateCw, Pause, Play, ZoomIn, ZoomOut, Move3d } from 'lucide-react';
 import * as THREE from 'three';
@@ -132,7 +132,7 @@ function PCCase({ rotate, selectedParts }: { rotate: boolean, selectedParts: any
 }
 
 const BuildVisualizer3D = () => {
-  const { selectedParts } = useBuild();
+  const { selectedParts } = useBuildStore();
   const [autoRotate, setAutoRotate] = useState(true);
   const [initialAnimation, setInitialAnimation] = useState(true);
   const [showControls, setShowControls] = useState(false);

@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from "react";
-import { useBuild } from "@/contexts/BuildContext";
-import { Part, PartCategory } from "@/data/mockData";
+import { useBuildStore } from "@/store/useBuildStore";
+import { Part, PartCategory } from "@/data/parts/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Cpu, HardDrive, Layers, MonitorSmartphone, Package, Plug, ShieldAlert, Unplug, Wand } from "lucide-react";
+import { Cpu, HardDrive, Layers, MonitorSmartphone, Package, Plug, ShieldAlert, Unplug, Wand, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { getAffiliateLink, formatAmazonPrice } from "@/utils/amazonUtils";
+import { Button } from "@/components/ui/button";
 
 const categoryIcons: Record<PartCategory, React.ReactNode> = {
   CPU: <Cpu className="w-5 h-5" />,
@@ -36,6 +38,8 @@ interface PartCardProps {
 }
 
 const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoSelected }) => {
+  const amazonUrl = part.asin ? getAffiliateLink(part.asin) : part.amazon_url;
+
   return (
     <Card 
       className={`cursor-pointer transition-all hover:shadow-md ${
@@ -45,25 +49,27 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
     >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg">{part.name}</CardTitle>
+          <div className="flex-1">
+            <CardTitle className="text-lg line-clamp-2">{part.name}</CardTitle>
             <CardDescription>{part.brand}</CardDescription>
           </div>
-          <div className="text-xl font-bold text-tech-purple">₹{part.price.toLocaleString()}</div>
+          <div className="text-xl font-bold text-tech-purple ml-2">
+            {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `₹${part.price.toLocaleString()}`}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="pb-2">
         <div className="space-y-1 text-sm">
-          {Object.entries(part.specs).map(([key, value]) => (
+          {Object.entries(part.specs).slice(0, 4).map(([key, value]) => (
             <div key={key} className="flex justify-between">
               <span className="text-gray-500 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-              <span className="font-medium">{value}</span>
+              <span className="font-medium truncate ml-2">{String(value)}</span>
             </div>
           ))}
         </div>
       </CardContent>
-      <CardFooter className="pt-0">
-        <div className="w-full flex justify-between text-sm">
+      <CardFooter className="pt-2 flex flex-col gap-2">
+        <div className="w-full flex justify-between text-sm mb-2">
           <div className="flex items-center">
             <span className="mr-1">Performance:</span>
             <div className="w-20 h-2 bg-gray-200 rounded-full">
@@ -84,6 +90,21 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
             </span>
           </div>
         </div>
+        
+        {amazonUrl && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs h-8 gap-1.5 border-orange-400 text-orange-700 hover:bg-orange-50 hover:text-orange-800"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(amazonUrl, '_blank');
+            }}
+          >
+            <ExternalLink className="w-3 h-3" />
+            View on Amazon
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
@@ -98,7 +119,7 @@ const PartsPicker: React.FC = () => {
     purpose,
     budget,
     buildMode
-  } = useBuild();
+  } = useBuildStore();
 
   const [activeCategory, setActiveCategory] = useState<PartCategory>("CPU");
   const [autoSelectedParts, setAutoSelectedParts] = useState<Record<PartCategory, boolean>>({

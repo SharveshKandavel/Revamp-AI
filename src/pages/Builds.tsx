@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { BuildProvider } from "@/contexts/BuildContext";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -72,7 +71,7 @@ const staticBuilds: Build[] = [
 
 const BuildsContent = () => {
   const { user } = useAuth();
-  const { selectPart, setPurpose, setBudget } = useBuild();
+  const { selectPart, setPurpose, setBudget } = useBuildStore();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -345,9 +344,7 @@ const getDifficultyColor = (difficulty: string) => {
 };
 
 const Builds = () => (
-  <BuildProvider>
-    <BuildsContent />
-  </BuildProvider>
+  <BuildsContent />
 );
 
 export default Builds;

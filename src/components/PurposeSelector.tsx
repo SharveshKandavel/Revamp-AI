@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBuild } from "@/contexts/BuildContext";
-import { PurposeType } from "@/data/mockData";
+import { useBuildStore } from "@/store/useBuildStore";
+import { PurposeType } from "@/data/parts/types";
 import { Gamepad2, Video, Code, Laptop, Wand, Sliders } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -49,7 +49,7 @@ const PurposeCard: React.FC<PurposeCardProps> = ({
 );
 
 const PurposeSelector: React.FC = () => {
-  const { purpose, setPurpose, selectPart, recommendations, setBuildMode } = useBuild();
+  const { purpose, setPurpose, setBuildMode } = useBuildStore();
   const [localBuildMode, setLocalBuildMode] = useState<"manual" | "automatic" | null>(null);
 
   const purposes = [

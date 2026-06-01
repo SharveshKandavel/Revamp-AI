@@ -3,7 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { motion } from "framer-motion";
 import { RotateCcw, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore } from "@/store/useBuildStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TouchOptimizedButton from "./TouchOptimizedButton";
 import { useMobileDevice, useTouch } from "@/hooks/useMobile";
@@ -65,7 +65,7 @@ const SimplePCCase = ({ selectedParts }: { selectedParts: any }) => {
 };
 
 const MobileOptimized3D: React.FC = () => {
-  const { selectedParts } = useBuild();
+  const { selectedParts } = useBuildStore();
   const [autoRotate, setAutoRotate] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const { triggerHaptic, isMobile } = useMobileDevice();

@@ -1,12 +1,13 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { Check, ExternalLink, HardDrive, Layers, MonitorSmartphone, Package, Plug, ShieldAlert, Unplug, X, ShoppingCart, Save } from "lucide-react";
-import { PartCategory } from "@/data/mockData";
+import { PartCategory } from "@/data/parts/types";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { getAffiliateLink, formatAmazonPrice } from "@/utils/amazonUtils";
 
 const categoryIcons: Record<PartCategory, React.ReactNode> = {
   CPU: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><path d="M15 2v2M15 20v2M2 15h2M20 15h2M2 9h2M20 9h2M9 2v2M9 20v2" /></svg>,
@@ -31,7 +32,8 @@ const categoryNames: Record<PartCategory, string> = {
 };
 
 const BuildSummary: React.FC = () => {
-  const { selectedParts, totalPrice, compatibilityResult } = useBuild();
+  const { selectedParts, compatibilityResult } = useBuildStore();
+  const totalPrice = useTotalPrice();
   const { user, isAuthenticated } = useAuth();
 
   // Count selected parts
@@ -154,7 +156,7 @@ const BuildSummary: React.FC = () => {
         <div className="space-y-3">
           {Object.entries(categoryNames).map(([category, name]) => {
             const part = selectedParts[category as PartCategory];
-            const affiliateLinks = part ? getAffiliateLinks(`${part.brand} ${part.name}`) : null;
+            const amazonUrl = part?.asin ? getAffiliateLink(part.asin) : part?.amazon_url;
             
             return (
               <div 
@@ -169,10 +171,10 @@ const BuildSummary: React.FC = () => {
                   }`}>
                     {categoryIcons[category as PartCategory]}
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium">{name}</div>
                     {part && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 truncate">
                         {part.brand} {part.name}
                       </div>
                     )}
@@ -181,31 +183,21 @@ const BuildSummary: React.FC = () => {
                 <div className="flex items-center gap-2">
                   {part ? (
                     <>
-                      <span className="font-medium">₹{part.price.toLocaleString()}</span>
-                      <Check className="w-4 h-4 text-green-500" />
+                      <span className="font-medium whitespace-nowrap">
+                        {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `₹${part.price.toLocaleString()}`}
+                      </span>
                       
-                      {/* Affiliate links */}
-                      {affiliateLinks && (
-                        <div className="flex space-x-1 ml-2">
-                          <a 
-                            href={affiliateLinks.amazon}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1 bg-amber-100 hover:bg-amber-200 rounded-md text-amber-800 transition-colors"
-                            title="View on Amazon"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 8c1.9 0 3-1.25 3-3.5 0-1.563-.526-3.5-3-3.5-1.116 0-3 1.035-3 3.5 0 .1 0 .307.01.584M5 8c-1.9 0-3-1.25-3-3.5 0-1.563.526-3.5 3-3.5 1.116 0 3 1.035 3 3.5 0 .1 0 .307-.01.584M9 22h6m-3-7v7m-8-7h14a2 2 0 0 0 1.857-1.257L19 9a1.999 1.999 0 0 0-2-2H7a2 2 0 0 0-2 2l-.857 4.743A2 2 0 0 0 6 15Z"/></svg>
-                          </a>
-                          <a 
-                            href={affiliateLinks.flipkart}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1 bg-blue-100 hover:bg-blue-200 rounded-md text-blue-800 transition-colors"
-                            title="View on Flipkart"
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                          </a>
-                        </div>
+                      {amazonUrl && (
+                        <a 
+                          href={amazonUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-md text-amber-800 transition-colors"
+                          title="View on Amazon"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
                       )}
                     </>
                   ) : (
@@ -261,32 +253,23 @@ const BuildSummary: React.FC = () => {
       </CardContent>
 
       <CardFooter className="flex flex-col space-y-3 pt-0">
-        <div className="w-full grid grid-cols-2 gap-3">
+        <div className="w-full">
           <a 
-            href={`https://www.amazon.in/s?k=pc+parts+${performanceLevel.level.toLowerCase()}&tag=revampai-21`}
+            href={`https://www.amazon.ca/s?k=pc+parts+${performanceLevel.level.toLowerCase()}&tag=revampai-20`}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-md flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-md flex items-center justify-center gap-2 transition-colors font-bold"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 8c1.9 0 3-1.25 3-3.5 0-1.563-.526-3.5-3-3.5-1.116 0-3 1.035-3 3.5 0 .1 0 .307.01.584M5 8c-1.9 0-3-1.25-3-3.5 0-1.563.526-3.5 3-3.5 1.116 0 3 1.035 3 3.5 0 .1 0 .307-.01.584M9 22h6m-3-7v7m-8-7h14a2 2 0 0 0 1.857-1.257L19 9a1.999 1.999 0 0 0-2-2H7a2 2 0 0 0-2 2l-.857 4.743A2 2 0 0 0 6 15Z"/></svg>
-            <span>Buy on Amazon</span>
-          </a>
-          <a 
-            href={`https://www.flipkart.com/search?q=pc+parts+${performanceLevel.level.toLowerCase()}&affid=revampai`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md flex items-center justify-center gap-2 transition-colors"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span>Buy on Flipkart</span>
+            <ExternalLink className="w-5 h-5" />
+            <span>Complete Build on Amazon</span>
           </a>
         </div>
         <button 
           onClick={handleSaveBuild}
-          className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-md flex items-center justify-center gap-2 transition-colors"
+          className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-md flex items-center justify-center gap-2 transition-colors text-gray-600"
         >
           <Save className="w-4 h-4" />
-          Save Build
+          Save to Profile
         </button>
       </CardFooter>
     </Card>

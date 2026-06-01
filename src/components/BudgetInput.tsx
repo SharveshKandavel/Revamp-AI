@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore } from "@/store/useBuildStore";
 import { IndianRupee, Coins } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
 const BudgetInput: React.FC = () => {
-  const { budget, setBudget } = useBuild();
+  const { budget, setBudget } = useBuildStore();
   const [localBudget, setLocalBudget] = useState(budget > 0 ? budget.toString() : "");
 
   const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {

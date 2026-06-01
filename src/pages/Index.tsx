@@ -1,5 +1,4 @@
 import React from "react";
-import { BuildProvider } from "@/contexts/BuildContext";
 import Header from "@/components/Header";
 import MobileOptimizedHeader from "@/components/mobile/MobileOptimizedHeader";
 import { useMobileDevice } from "@/hooks/useMobile";
@@ -15,13 +14,17 @@ import BuildCompatibilityVisualizer from "@/components/BuildCompatibilityVisuali
 import BuildVisualizer3D from "@/components/BuildVisualizer3D";
 import PowerConsumptionCalculator from "@/components/PowerConsumptionCalculator";
 import { motion } from "framer-motion";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore } from "@/store/useBuildStore";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Wrench } from "lucide-react";
 
 const MainContent = () => {
-  const { userType, setUserType } = useBuild();
+  const { userType, setUserType, fetchCatalog } = useBuildStore();
   const { isMobile } = useMobileDevice();
+
+  React.useEffect(() => {
+    fetchCatalog();
+  }, [fetchCatalog]);
 
   const HeaderComponent = isMobile ? MobileOptimizedHeader : Header;
 
@@ -160,11 +163,7 @@ const MainContent = () => {
 };
 
 const Index = () => {
-  return (
-    <BuildProvider>
-      <MainContent />
-    </BuildProvider>
-  );
+  return <MainContent />;
 };
 
 export default Index;

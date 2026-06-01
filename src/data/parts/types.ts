@@ -12,13 +12,16 @@ export type PartCategory =
 export type PurposeType = 'Gaming' | 'VideoEditing' | 'Programming' | 'EverydayUse';
 
 export interface Part {
-  id: string;
+  id: string | number;
+  asin?: string;
   category: PartCategory;
   name: string;
   brand: string;
   price: number;
+  current_price_cents?: number;
   image: string;
-  specs: Record<string, string | number>;
+  specs: Record<string, any>;
   recommendedFor: PurposeType[];
   performance: number;
+  amazon_url?: string;
 }

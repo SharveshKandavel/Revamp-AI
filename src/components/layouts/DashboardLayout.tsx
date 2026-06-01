@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BuildProvider } from "@/contexts/BuildContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, 
@@ -11,12 +10,11 @@ import { Link } from "react-router-dom";
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
-
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <BuildProvider>
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gray-50">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-50">
+...
           <Sidebar>
             <SidebarHeader className="p-4">
               <h2 className="text-xl font-bold">PC Builder Dashboard</h2>
@@ -77,7 +75,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
         </div>
       </SidebarProvider>
-    </BuildProvider>
   );
 };
 

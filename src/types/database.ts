@@ -3,12 +3,19 @@ import { PartCategory } from "@/data/mockData";
 
 export interface Product {
   id: number;
-  seller_id: string;
+  seller_id: string | null;
+  asin?: string;
   name: string;
   category: string;
+  manufacturer?: string;
+  model?: string;
   price: number;
+  current_price_cents?: number;
   stock: number;
   image_url: string;
+  specs: Record<string, any>;
+  amazon_url?: string;
+  last_updated?: string;
   created_at: string;
 }
 
@@ -28,8 +35,9 @@ export interface Build {
   title: string;
   description: string;
   total_price: number;
-  parts: Record<PartCategory, any>;
-  performance: string;
+  parts: Record<string, any>; // Stores ASINs or product IDs
+  compatibility_score: number;
+  performance_metrics: Record<string, any>;
   likes: number;
   created_at: string;
   // UI extended props

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X, ShoppingCart, Wrench, User } from "lucide-react";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
@@ -13,8 +13,8 @@ interface MobileOptimizedHeaderProps {
 
 const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const buildContext = useBuild();
-  const { totalPrice = 0 } = buildContext;
+  const buildContext = useBuildStore();
+  const totalPrice = useTotalPrice();
   const location = useLocation();
   const { triggerHaptic, isMobile } = useMobileDevice();
 

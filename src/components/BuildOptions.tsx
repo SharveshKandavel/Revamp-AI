@@ -1,14 +1,15 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Wrench, User, ShoppingCart, Send } from "lucide-react";
-import { useBuild } from "@/contexts/BuildContext";
+import { MapPin, Wrench, User, ShoppingCart, Send, ExternalLink } from "lucide-react";
+import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
 const BuildOptions: React.FC = () => {
-  const { selectedParts, totalPrice, assemblyOption, setAssemblyOption } = useBuild();
+  const { selectedParts, assemblyOption, setAssemblyOption } = useBuildStore();
+  const totalPrice = useTotalPrice();
   const { user, isAuthenticated } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -29,14 +30,8 @@ const BuildOptions: React.FC = () => {
     
     const searchQuery = encodeURIComponent(`PC components ${partNames}`);
     
-    // Replace with your actual Amazon and Flipkart affiliate IDs
-    const amazonAffiliateId = "revampai-21";
-    const flipkartAffiliateId = "revampai";
-    
-    return {
-      amazon: `https://www.amazon.in/s?k=${searchQuery}&tag=${amazonAffiliateId}`,
-      flipkart: `https://www.flipkart.com/search?q=${searchQuery}&affid=${flipkartAffiliateId}`
-    };
+    // Using Canada domain and verified tag
+    return `https://www.amazon.ca/s?k=${searchQuery}&tag=revampai-20`;
   };
 
   const handlePlaceOrder = async () => {
@@ -46,10 +41,9 @@ const BuildOptions: React.FC = () => {
     }
 
     if (assemblyOption === "self") {
-      const links = getWholeSetupLinks();
-      window.open(links.amazon, '_blank');
-      window.open(links.flipkart, '_blank');
-      toast.success("Redirecting to our partner stores!");
+      const amazonUrl = getWholeSetupLinks();
+      window.open(amazonUrl, '_blank');
+      toast.success("Redirecting to Amazon Canada!");
     } else {
       // Professional assembly request
       if (!isAuthenticated) {

@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { useBuild } from '@/contexts/BuildContext';
+import { useBuildStore } from '@/store/useBuildStore';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 import { Zap } from 'lucide-react';
 
 const PowerConsumptionCalculator = () => {
-  const { selectedParts } = useBuild();
+  const { selectedParts } = useBuildStore();
   
   // Calculate total power consumption
   const calculatePowerConsumption = () => {

@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import { BuildProvider } from "@/contexts/BuildContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -503,9 +502,7 @@ const getStatusColor = (status: Order['status']) => {
 
 const SellerDashboard = () => {
   return (
-    <BuildProvider>
-      <SellerDashboardContent />
-    </BuildProvider>
+    <SellerDashboardContent />
   );
 };
 

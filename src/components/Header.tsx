@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Menu, ShoppingCart, Wrench, User, LogOut } from "lucide-react";
-import { useBuild } from "@/contexts/BuildContext";
+import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { motion } from "framer-motion";
@@ -23,8 +23,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = () => {
-  const buildContext = useBuild();
-  const { totalPrice = 0 } = buildContext;
+  const buildContext = useBuildStore();
+  const totalPrice = useTotalPrice();
   const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
