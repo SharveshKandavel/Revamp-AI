@@ -58,34 +58,17 @@ export const useBuildStore = create<BuildState>((set, get) => ({
   fetchCatalog: async () => {
     set({ isLoading: true });
     try {
-      // Step 1: Fetch existing catalog from backend
+      // Try to fetch from backend
       const response = await fetch(`${API_BASE_URL}/catalog`);
       if (!response.ok) throw new Error("Backend unavailable");
       
       let data = await response.json();
 
-      // Step 2: If catalog is empty or very small, trigger a sync
       if (!data || data.length < 5) {
-        console.log("Catalog is empty/sparse — triggering Rainforest sync...");
-        try {
-          const syncResponse = await fetch(`${API_BASE_URL}/sync-all`, { method: "POST" });
-          if (syncResponse.ok) {
-            const syncResult = await syncResponse.json();
-            console.log("Sync result:", syncResult);
-            
-            // Re-fetch catalog after sync
-            const refreshed = await fetch(`${API_BASE_URL}/catalog`);
-            if (refreshed.ok) {
-              data = await refreshed.json();
-            }
-          }
-        } catch (syncErr) {
-          console.warn("Sync failed, using existing data:", syncErr);
-        }
+        throw new Error("Catalog is empty/sparse");
       }
 
-      // Transform Backend products into Part format
-      const parts: Part[] = (data || []).map((p: any) => ({
+      const parts: Part[] = data.map((p: any) => ({
         id: p.id,
         asin: p.asin,
         category: p.category as PartCategory,
@@ -101,10 +84,13 @@ export const useBuildStore = create<BuildState>((set, get) => ({
       }));
 
       set({ catalog: parts });
-      get().updateRecommendations();
     } catch (err) {
-      console.error("Failed to fetch catalog from FastAPI:", err);
+      console.warn("Falling back to local static catalog due to backend error:", err);
+      // Import PARTS dynamically or use it if imported at top
+      const { PARTS } = await import('@/data/mockData');
+      set({ catalog: PARTS as Part[] });
     } finally {
+      get().updateRecommendations();
       set({ isLoading: false });
     }
   },
