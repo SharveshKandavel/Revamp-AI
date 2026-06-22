@@ -27,7 +27,7 @@ const Hero = () => {
 
           <h1 className="text-4xl md:text-7xl font-bold text-white mb-6 tracking-tight">
             Build Your Dream PC with
-            <span className="text-tech-accent"> AI Power</span>
+            <span className="text-tech-accent"> Smart Power</span>
           </h1>
           <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
             Our intelligent system helps you create the perfect custom PC build
@@ -52,7 +52,7 @@ const Hero = () => {
               {
                 icon: <Cpu className="w-8 h-8" />,
                 title: "Smart Selection",
-                description: "AI-powered component recommendations based on your requirements"
+                description: "Smart component recommendations based on your requirements"
               },
               {
                 icon: <Zap className="w-8 h-8" />,

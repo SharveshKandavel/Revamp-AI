@@ -88,7 +88,7 @@ const PurposeSelector: React.FC = () => {
 
     setLocalBuildMode("automatic");
     setBuildMode("automatic");
-    toast.success("AI is synthesizing the optimal configuration");
+    toast.success("System is computing the optimal configuration");
   };
 
   const handleManualBuild = () => {
@@ -137,7 +137,7 @@ const PurposeSelector: React.FC = () => {
                 <div className="p-3 rounded-xl bg-tech-purple/10 text-tech-purple">
                   <Wand className="w-6 h-6" />
                 </div>
-                <CardTitle className="text-xl">AI Synthesis</CardTitle>
+                <CardTitle className="text-xl">System Synthesis</CardTitle>
               </div>
               <CardDescription className="text-base leading-relaxed font-medium">
                 Allow the curation engine to architect the optimal component ecosystem based on your performance intent.

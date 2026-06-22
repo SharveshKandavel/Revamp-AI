@@ -84,10 +84,9 @@ export const useBuildStore = create<BuildState>((set, get) => ({
 
       set({ catalog: parts });
     } catch (err) {
-      console.warn("Falling back to local static catalog due to backend error:", err);
-      // Import PARTS dynamically or use it if imported at top
-      const { PARTS } = await import('@/data/mockData');
-      set({ catalog: PARTS as Part[] });
+      console.error("Failed to load catalog from Supabase:", err);
+      // Empty catalog state handled gracefully by UI
+      set({ catalog: [] });
     } finally {
       get().updateRecommendations();
       set({ isLoading: false });

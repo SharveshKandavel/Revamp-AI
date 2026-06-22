@@ -1,5 +1,5 @@
 
-import { PartCategory } from "@/data/mockData";
+import { PartCategory } from "@/data/parts/types";
 
 export interface Product {
   id: number;

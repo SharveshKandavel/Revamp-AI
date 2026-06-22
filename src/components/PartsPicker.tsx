@@ -89,7 +89,7 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
               {isAutoSelected && (
                 <div className="flex items-center text-tech-purple gap-1">
                   <Wand className="w-3 h-3" />
-                  <span>AI Selected</span>
+                  <span>Auto-Selected</span>
                 </div>
               )}
               {isSelected && (
@@ -156,7 +156,7 @@ const PartsPicker: React.FC = () => {
       
       setAutoSelectedParts(newAutoSelected);
       setAiSelectionCompleted(true);
-      toast.success("AI Synthesis complete: optimal components selected.");
+      toast.success("Algorithm complete: optimal components selected.");
     }
   }, [buildMode, purpose, budget, recommendations, selectPart, aiSelectionCompleted]);
 
@@ -177,7 +177,7 @@ const PartsPicker: React.FC = () => {
           {buildMode === "automatic" && (
             <div className="flex items-center text-tech-purple glass-card px-4 py-2 rounded-full border-none">
               <Wand className="w-4 h-4 mr-2" />
-              <span className="text-xs font-black uppercase tracking-widest">AI Optimized</span>
+              <span className="text-xs font-black uppercase tracking-widest">System Optimized</span>
             </div>
           )}
           {!compatibilityResult.compatible && (

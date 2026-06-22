@@ -22,7 +22,7 @@ const BuildCompatibilityVisualizer = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Zap className="w-5 h-5 text-tech-purple" />
-          AI Build Analysis
+          System Build Analysis
         </CardTitle>
       </CardHeader>
       <CardContent>
