@@ -191,9 +191,40 @@ export const useBuildStore = create<BuildState>((set, get) => ({
       Storage: [], PowerSupply: [], Case: [], Monitor: [],
     };
 
-    catalog.forEach(part => {
-      if (part.price <= budget && part.category in filtered) {
-        filtered[part.category].push(part);
+    // Allocate budget percentages based on purpose
+    const budgetAllocations: Record<PartCategory, number> = {
+      CPU: purpose === 'Gaming' ? 0.25 : 0.35,
+      GPU: purpose === 'Gaming' ? 0.40 : 0.20,
+      Motherboard: 0.10,
+      RAM: 0.08,
+      Storage: 0.07,
+      PowerSupply: 0.05,
+      Case: 0.05,
+      Monitor: 0.0 // Handled separately or optional if we don't strictly bind it to core budget
+    };
+
+    Object.keys(filtered).forEach(cat => {
+      const category = cat as PartCategory;
+      // If category is monitor, give it a fixed generic allowance or 20% of budget on top
+      const categoryBudget = category === 'Monitor' 
+        ? budget * 0.2 
+        : budget * budgetAllocations[category];
+
+      // Filter parts for this category within budget, then sort by price descending to get the best parts they can afford
+      const parts = catalog
+        .filter(p => p.category === category && p.price > 0 && p.price <= categoryBudget)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 15); // Keep top 15 recommendations per category
+      
+      // Fallback: if budget is too strict and returns 0 parts, just give them the 5 cheapest parts in that category
+      if (parts.length === 0) {
+        const cheapestParts = catalog
+          .filter(p => p.category === category && p.price > 0)
+          .sort((a, b) => a.price - b.price)
+          .slice(0, 5);
+        filtered[category] = cheapestParts;
+      } else {
+        filtered[category] = parts;
       }
     });
 
