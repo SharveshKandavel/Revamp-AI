@@ -40,62 +40,66 @@ const BudgetInput: React.FC = () => {
   };
 
   return (
-    <Card className="mb-8 hover-scale transition-all duration-300">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-2xl text-tech-dark flex items-center">
-          <Coins className="mr-2 text-tech-purple" size={24} />
-          What's your budget?
+    <Card className="mb-12 glass-card border-none shadow-2xl overflow-hidden relative group transition-all duration-500">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-tech-purple/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-tech-purple/10 transition-colors" />
+      
+      <CardHeader className="pb-6 pt-10 px-8 relative z-10">
+        <CardTitle className="text-3xl font-bold text-tech-dark dark:text-white flex items-center tracking-tight">
+          <Coins className="mr-3 text-tech-purple" size={28} />
+          Define Your Investment
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col space-y-6">
+      
+      <CardContent className="px-8 pb-10 relative z-10">
+        <div className="flex flex-col space-y-10">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <span className="text-gray-500">₹</span>
+            <div className="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none">
+              <span className="text-2xl font-light text-gray-400">₹</span>
             </div>
             <input
               type="text"
               value={localBudget}
               onChange={handleBudgetChange}
-              placeholder="Enter your budget"
-              className="pl-8 w-full h-12 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-tech-purple px-4"
+              placeholder="0.00"
+              className="pl-12 w-full h-20 text-4xl font-bold bg-transparent border-b-2 border-gray-100 dark:border-gray-800 focus:border-tech-purple focus:outline-none transition-colors placeholder:text-gray-200"
               onKeyDown={(e) => e.key === "Enter" && handleBudgetSubmit()}
             />
             <button
               onClick={handleBudgetSubmit}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-tech-purple text-white px-4 py-1 rounded-md hover:bg-opacity-90 transition-colors"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-tech-dark hover:bg-black text-white px-8 h-12 rounded-full font-bold text-sm tracking-wider uppercase hover-lift"
             >
-              Set Budget
+              Establish
             </button>
           </div>
 
           {localBudget && (
-            <div className="space-y-1">
-              <Progress value={getProgressValue()} className="h-2" />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>₹0</span>
-                <span>₹100,000</span>
-                <span>₹200,000+</span>
+            <div className="space-y-3">
+              <Progress value={getProgressValue()} className="h-1.5 bg-gray-100 dark:bg-gray-800" />
+              <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                <span>Entry-Level</span>
+                <span>Elite Architecture</span>
               </div>
             </div>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {budgetRanges.map((range) => (
               <button
                 key={range.value}
                 onClick={() => {
                   setLocalBudget(range.value.toString());
                   setBudget(range.value);
-                  toast.success(`Budget set to ₹${range.value.toLocaleString()}`);
+                  toast.success(`Investment established at ₹${range.value.toLocaleString()}`);
                 }}
-                className={`p-3 border rounded-md text-center hover:bg-gray-50 transition-all ${
-                  budget === range.value ? "border-tech-purple bg-tech-purple bg-opacity-10 shadow-md" : "border-gray-200"
+                className={`p-4 border rounded-2xl text-left transition-all duration-300 hover-lift ${
+                  budget === range.value 
+                    ? "border-tech-purple bg-tech-purple/5 shadow-xl" 
+                    : "glass-card border-none hover:bg-white/60 dark:hover:bg-slate-900/60"
                 }`}
               >
-                <div className="font-semibold">{range.label}</div>
-                <div className={`text-sm mt-1 ${range.color} text-white rounded-full px-2 py-1`}>
-                  ₹{range.value.toLocaleString()}
+                <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">{range.label}</div>
+                <div className={`text-lg font-bold ${range.color.replace('bg-', 'text-')}`}>
+                  ₹{(range.value / 1000).toLocaleString()}k
                 </div>
               </button>
             ))}

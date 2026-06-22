@@ -61,7 +61,7 @@ const BuildSummary: React.FC = () => {
   const performanceLevel = calculatePerformanceLevel();
 
   const handleSaveBuild = async () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       toast.error("Please login to save your build", {
         description: "Join Revamp AI to keep your custom configurations."
       });
@@ -69,90 +69,43 @@ const BuildSummary: React.FC = () => {
     }
 
     try {
-      const buildData = {
-        user_id: user?.id,
-        title: `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`,
-        description: `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`,
-        total_price: totalPrice,
-        parts: selectedParts,
-        performance: performanceLevel.level,
-        is_public: true
-      };
-
-      const { data, error } = await supabase
-        .from('builds')
-        .insert([buildData])
-        .select();
-
-      if (error) throw error;
+      const title = `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`;
+      const description = `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`;
+      
+      const { saveBuild } = useBuildStore.getState();
+      await saveBuild(title, description, user.id);
 
       toast.success("Build saved to cloud!", {
         description: "You can view your saved builds in your dashboard."
       });
     } catch (error: any) {
       console.error("Error saving build:", error.message);
-      
-      // Fallback to local storage if supabase fails
-      const savedBuilds = JSON.parse(localStorage.getItem("saved_builds") || "[]");
-      const newBuild = {
-        id: Date.now(),
-        userId: user?.id,
-        title: `${performanceLevel.level} Build - ${new Date().toLocaleDateString()}`,
-        description: `A custom ${performanceLevel.level.toLowerCase()} machine with ${selectedParts.CPU?.name || 'various components'}.`,
-        price: totalPrice,
-        parts: selectedParts,
-        performance: performanceLevel.level,
-        date: new Date().toISOString(),
-        likes: 0,
-        author: user?.name || "Guest",
-        rating: 5.0,
-        difficulty: performanceLevel.level === 'High-End' ? 'Advanced' : 'Intermediate',
-        category: 'Custom',
-        specs: [selectedParts.GPU?.name, selectedParts.CPU?.name].filter(Boolean)
-      };
-
-      localStorage.setItem("saved_builds", JSON.stringify([newBuild, ...savedBuilds]));
-      toast.info("Build saved locally", {
-        description: "We saved it to your browser as a backup."
+      toast.error("Failed to save build to cloud", {
+        description: error.message
       });
     }
   };
 
-  // Generate affiliate links for products
-  const getAffiliateLinks = (partName: string) => {
-    // Replace spaces with plus signs for URL friendly search queries
-    const searchQuery = encodeURIComponent(partName);
-    
-    // Replace with your actual Amazon and Flipkart affiliate IDs
-    const amazonAffiliateId = "revampai-21";
-    const flipkartAffiliateId = "revampai";
-    
-    return {
-      amazon: `https://www.amazon.in/s?k=${searchQuery}&tag=${amazonAffiliateId}`,
-      flipkart: `https://www.flipkart.com/search?q=${searchQuery}&affid=${flipkartAffiliateId}`
-    };
-  };
-
   return (
-    <Card className="mb-8">
-      <CardHeader>
+    <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
+      <CardHeader className="px-8 pt-8">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-xl">Your PC Build</CardTitle>
-            <CardDescription>
-              {selectedCount} of 8 components selected
+            <CardTitle className="text-2xl font-bold tracking-tight">Configuration Matrix</CardTitle>
+            <CardDescription className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">
+              {selectedCount} of 8 components verified
             </CardDescription>
           </div>
           <div className="text-right">
-            <div className="text-sm text-gray-500">Estimated Cost</div>
-            <div className="text-2xl font-bold text-tech-purple">
+            <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Curation Value</div>
+            <div className="text-3xl font-black text-tech-purple">
               ₹{totalPrice.toLocaleString()}
             </div>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="px-8">
         <div className="space-y-3">
           {Object.entries(categoryNames).map(([category, name]) => {
             const part = selectedParts[category as PartCategory];
@@ -161,29 +114,29 @@ const BuildSummary: React.FC = () => {
             return (
               <div 
                 key={category}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  part ? "border-green-100 bg-green-50" : "border-gray-200 bg-gray-50"
+                className={`flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${
+                  part ? "glass-card border-none ring-1 ring-green-500/20 bg-green-500/5" : "bg-gray-100/30 dark:bg-slate-900/30 border border-white/5"
                 }`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${
-                    part ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-500"
+                <div className="flex items-center gap-4">
+                  <div className={`p-2 rounded-xl ${
+                    part ? "text-green-500 bg-green-500/10" : "text-gray-400"
                   }`}>
                     {categoryIcons[category as PartCategory]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium">{name}</div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">{name}</div>
                     {part && (
-                      <div className="text-sm text-gray-600 truncate">
+                      <div className="font-bold text-sm truncate dark:text-white">
                         {part.brand} {part.name}
                       </div>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   {part ? (
                     <>
-                      <span className="font-medium whitespace-nowrap">
+                      <span className="font-black text-sm whitespace-nowrap dark:text-white">
                         {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `₹${part.price.toLocaleString()}`}
                       </span>
                       
@@ -192,7 +145,7 @@ const BuildSummary: React.FC = () => {
                           href={amazonUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 bg-amber-100 hover:bg-amber-200 rounded-md text-amber-800 transition-colors"
+                          className="p-2 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl text-amber-600 transition-colors"
                           title="View on Amazon"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -202,8 +155,8 @@ const BuildSummary: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <span className="text-sm text-gray-400">Not selected</span>
-                      <X className="w-4 h-4 text-gray-300" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-300">Pending</span>
+                      <X className="w-4 h-4 text-gray-200" />
                     </>
                   )}
                 </div>
@@ -212,64 +165,64 @@ const BuildSummary: React.FC = () => {
           })}
         </div>
 
-        <div className="mt-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-500">Build Performance</div>
-              <div className={`font-medium ${performanceLevel.color}`}>
-                {performanceLevel.level}
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
-              <div 
-                className={`${
-                  compatibilityResult.compatible 
-                    ? "text-green-600 bg-green-50" 
-                    : "text-red-600 bg-red-50"
-                } px-3 py-1 rounded-full flex items-center gap-1.5 text-sm font-medium`}
-              >
-                {compatibilityResult.compatible ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Compatible</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldAlert className="w-4 h-4" />
-                    <span>Incompatible</span>
-                  </>
-                )}
-              </div>
+        <div className="mt-8 p-6 glass-card rounded-2xl border-none flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Performance Tier</div>
+            <div className={`text-lg font-black ${performanceLevel.color}`}>
+              {performanceLevel.level}
             </div>
           </div>
-          
-          {!compatibilityResult.compatible && compatibilityResult.message && (
-            <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 flex gap-2">
-              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>{compatibilityResult.message}</span>
+          <div className="flex items-center gap-1">
+            <div 
+              className={`${
+                compatibilityResult.compatible 
+                  ? "text-green-500 bg-green-500/10" 
+                  : "text-red-500 bg-red-500/10"
+              } px-4 py-2 rounded-full flex items-center gap-2 text-[10px] font-black uppercase tracking-widest`}
+            >
+              {compatibilityResult.compatible ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Verified Compatible</span>
+                </>
+              ) : (
+                <>
+                  <ShieldAlert className="w-4 h-4" />
+                  <span>Integrity Failed</span>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </div>
+        
+        {!compatibilityResult.compatible && compatibilityResult.message && (
+          <div className="mt-4 p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-xs text-red-500 flex gap-3 font-medium leading-relaxed">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <span>{compatibilityResult.message}</span>
+          </div>
+        )}
       </CardContent>
 
-      <CardFooter className="flex flex-col space-y-3 pt-0">
-        <div className="w-full">
+      <CardFooter className="flex flex-col gap-3 px-8 pb-8 pt-6 border-t border-white/10 bg-white/5">
+        <Button 
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white h-14 rounded-xl flex items-center justify-center gap-3 transition-all font-black uppercase tracking-widest text-xs"
+          asChild
+        >
           <a 
             href={`https://www.amazon.ca/s?k=pc+parts+${performanceLevel.level.toLowerCase()}&tag=revampai-20`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-md flex items-center justify-center gap-2 transition-colors font-bold"
           >
             <ExternalLink className="w-5 h-5" />
-            <span>Complete Build on Amazon</span>
+            Complete Selection on Amazon
           </a>
-        </div>
+        </Button>
         <button 
           onClick={handleSaveBuild}
-          className="w-full border border-gray-300 hover:bg-gray-50 py-2 rounded-md flex items-center justify-center gap-2 transition-colors text-gray-600"
+          className="w-full h-12 rounded-xl flex items-center justify-center gap-2 transition-all text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-tech-purple hover:bg-tech-purple/5"
         >
           <Save className="w-4 h-4" />
-          Save to Profile
+          Cloud Sync Matrix
         </button>
       </CardFooter>
     </Card>

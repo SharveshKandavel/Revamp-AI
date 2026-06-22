@@ -1,15 +1,18 @@
 import { create } from 'zustand';
-import { Part, PartCategory, PurposeType } from '@/data/parts/types';
+import { Part, PartCategory, PurposeType, Build } from '@/data/parts/types';
 import { isCompatible } from '@/data/parts/compatibility';
 import { recommendParts } from '@/data/parts/recommendations';
 import { supabase } from '@/lib/supabase';
+
+// Configuration
+const API_BASE_URL = "http://localhost:8000";
 
 interface BuildState {
   purpose: PurposeType | null;
   budget: number;
   selectedParts: Record<PartCategory, Part | null>;
   recommendations: Record<PartCategory, Part[]>;
-  catalog: Part[]; // All parts from Supabase
+  catalog: Part[]; // All parts from Backend
   isLoading: boolean;
   compatibilityResult: { compatible: boolean; message?: string };
   userType: string | null;
@@ -18,6 +21,9 @@ interface BuildState {
   
   // Actions
   fetchCatalog: () => Promise<void>;
+  saveBuild: (title: string, description: string, userId: string) => Promise<any>;
+  fetchUserBuilds: (userId: string) => Promise<Build[]>;
+  fetchCommunityBuilds: () => Promise<Build[]>;
   setPurpose: (purpose: PurposeType) => void;
   setBudget: (budget: number) => void;
   selectPart: (category: PartCategory, part: Part | null) => void;
@@ -52,14 +58,34 @@ export const useBuildStore = create<BuildState>((set, get) => ({
   fetchCatalog: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*');
+      // Step 1: Fetch existing catalog from backend
+      const response = await fetch(`${API_BASE_URL}/catalog`);
+      if (!response.ok) throw new Error("Backend unavailable");
       
-      if (error) throw error;
+      let data = await response.json();
 
-      // Transform Supabase products back into Part format
-      const parts: Part[] = (data || []).map(p => ({
+      // Step 2: If catalog is empty or very small, trigger a sync
+      if (!data || data.length < 5) {
+        console.log("Catalog is empty/sparse — triggering Rainforest sync...");
+        try {
+          const syncResponse = await fetch(`${API_BASE_URL}/sync-all`, { method: "POST" });
+          if (syncResponse.ok) {
+            const syncResult = await syncResponse.json();
+            console.log("Sync result:", syncResult);
+            
+            // Re-fetch catalog after sync
+            const refreshed = await fetch(`${API_BASE_URL}/catalog`);
+            if (refreshed.ok) {
+              data = await refreshed.json();
+            }
+          }
+        } catch (syncErr) {
+          console.warn("Sync failed, using existing data:", syncErr);
+        }
+      }
+
+      // Transform Backend products into Part format
+      const parts: Part[] = (data || []).map((p: any) => ({
         id: p.id,
         asin: p.asin,
         category: p.category as PartCategory,
@@ -69,17 +95,71 @@ export const useBuildStore = create<BuildState>((set, get) => ({
         current_price_cents: p.current_price_cents,
         image: p.image_url,
         specs: p.specs,
-        recommendedFor: ['Gaming', 'Programming'], // Default or derived
-        performance: 8, // Derived from specs in a real app
+        recommendedFor: ['Gaming', 'Programming'], 
+        performance: 8,
         amazon_url: p.amazon_url
       }));
 
       set({ catalog: parts });
       get().updateRecommendations();
     } catch (err) {
-      console.error("Failed to fetch catalog:", err);
+      console.error("Failed to fetch catalog from FastAPI:", err);
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  saveBuild: async (title: string, description: string, userId: string) => {
+    const { selectedParts, compatibilityResult } = get();
+    
+    const buildData = {
+      user_id: userId,
+      title,
+      description,
+      parts: selectedParts,
+      compatibility_score: compatibilityResult.compatible ? 100 : 50,
+      is_public: true
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/builds`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || "Failed to save build");
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.error("Build persist error:", err);
+      throw err;
+    }
+  },
+
+  fetchUserBuilds: async (userId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/builds/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch user builds");
+      return await response.json();
+    } catch (err) {
+      console.error("User builds fetch error:", err);
+      return [];
+    }
+  },
+
+  fetchCommunityBuilds: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/builds`);
+      if (!response.ok) throw new Error("Failed to fetch community builds");
+      const builds = await response.json();
+      return builds.filter((b: any) => b.is_public);
+    } catch (err) {
+      console.error("Community builds fetch error:", err);
+      return [];
     }
   },
 
@@ -125,7 +205,6 @@ export const useBuildStore = create<BuildState>((set, get) => ({
     const { purpose, budget, catalog } = get();
     if (!purpose || budget <= 0) return;
 
-    // Filter catalog instead of using mock data
     const filtered: Record<PartCategory, Part[]> = {
       CPU: [], GPU: [], Motherboard: [], RAM: [],
       Storage: [], PowerSupply: [], Case: [], Monitor: [],

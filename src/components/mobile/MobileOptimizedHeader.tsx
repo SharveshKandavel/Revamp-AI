@@ -22,8 +22,7 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
     { name: "Home", path: "/" },
     { name: "Builds", path: "/builds" },
     { name: "Guides", path: "/guides" },
-    { name: "Seller Dashboard", path: "/seller", visibleFor: ["seller"] },
-    { name: "Builder Dashboard", path: "/builder", visibleFor: ["builder"] }
+    { name: "Seller Dashboard", path: "/seller", visibleFor: ["seller"] }
   ];
 
   const filteredNavItems = navItems.filter(item => 
@@ -46,8 +45,6 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
         return <User className="w-4 h-4" />;
       case 'seller':
         return <ShoppingCart className="w-4 h-4" />;
-      case 'builder':
-        return <Wrench className="w-4 h-4" />;
       default:
         return null;
     }
@@ -92,8 +89,7 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
               <div className="hidden sm:flex bg-primary/10 px-3 py-1.5 rounded-full text-primary items-center gap-1.5">
                 {getUserTypeIcon()}
                 <span className="text-xs font-medium">
-                  {userType === 'customer' ? 'Enthusiast' : 
-                   userType === 'seller' ? 'Seller' : 'Builder'}
+                  {userType === 'customer' ? 'Enthusiast' : 'Seller'}
                 </span>
               </div>
             )}
@@ -151,8 +147,7 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
                       </div>
                       <div>
                         <p className="font-semibold text-foreground">
-                          {userType === 'customer' ? 'PC Enthusiast' : 
-                           userType === 'seller' ? 'Parts Seller' : 'PC Builder'}
+                          {userType === 'customer' ? 'PC Enthusiast' : 'Parts Seller'}
                         </p>
                         {totalPrice > 0 && (
                           <p className="text-sm text-muted-foreground">

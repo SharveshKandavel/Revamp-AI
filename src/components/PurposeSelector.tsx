@@ -26,23 +26,24 @@ const PurposeCard: React.FC<PurposeCardProps> = ({
   <motion.div
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
+    className="h-full"
   >
     <Card 
-      className={`cursor-pointer transition-all hover:shadow-md ${
-        selected ? "ring-2 ring-tech-purple shadow-lg" : ""
+      className={`cursor-pointer transition-all h-full glass-card border-none group ${
+        selected ? "ring-2 ring-tech-purple shadow-xl" : "glass-card-hover"
       }`}
       onClick={() => onSelect(type)}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-full ${selected ? "bg-tech-purple text-white" : "bg-secondary/50 text-tech-purple"}`}>
+          <div className={`p-2 rounded-full transition-colors duration-500 ${selected ? "bg-tech-purple text-white" : "bg-tech-purple/10 text-tech-purple group-hover:bg-tech-purple group-hover:text-white"}`}>
             {icon}
           </div>
           <CardTitle className="text-xl">{title}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="text-sm font-medium">{description}</CardDescription>
       </CardContent>
     </Card>
   </motion.div>
@@ -56,58 +57,57 @@ const PurposeSelector: React.FC = () => {
     {
       title: "Gaming",
       type: "Gaming" as PurposeType,
-      description: "High performance for running the latest games",
+      description: "Elite performance for real-time simulations and cinematic fidelity.",
       icon: <Gamepad2 className="w-5 h-5" />
     },
     {
-      title: "Video Editing",
+      title: "CGI / Rendering",
       type: "VideoEditing" as PurposeType,
-      description: "Powerful processing for video work and rendering",
+      description: "Compute overhead for complex visual synthesis and rendering workloads.",
       icon: <Video className="w-5 h-5" />
     },
     {
-      title: "Programming",
+      title: "Engineering",
       type: "Programming" as PurposeType,
-      description: "Efficient multitasking for development work",
+      description: "Optimized multitasking for large-scale development and architectural cycles.",
       icon: <Code className="w-5 h-5" />
     },
     {
-      title: "Everyday Use",
+      title: "Workstation",
       type: "EverydayUse" as PurposeType,
-      description: "Reliable performance for browsing and office tasks",
+      description: "Stable performance for institutional workflows and executive productivity.",
       icon: <Laptop className="w-5 h-5" />
     }
   ];
 
   const handleAutomaticBuild = () => {
     if (!purpose) {
-      toast.error("Please select a purpose first");
+      toast.error("Please select a curation objective first");
       return;
     }
 
     setLocalBuildMode("automatic");
     setBuildMode("automatic");
-    toast.success("AI is assembling the best PC for your needs");
+    toast.success("AI is synthesizing the optimal configuration");
   };
 
   const handleManualBuild = () => {
     if (!purpose) {
-      toast.error("Please select a purpose first");
+      toast.error("Please select a curation objective first");
       return;
     }
     
     setLocalBuildMode("manual");
     setBuildMode("manual");
-    toast.success("You can now customize your PC build");
+    toast.success("Manual architectural control established");
   };
 
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-tech-dark mb-4 flex items-center">
-        <span className="mr-2">🎯</span>
-        What will you use your PC for?
+    <div className="mb-12">
+      <h2 className="text-3xl font-bold text-tech-dark dark:text-white mb-8">
+        Performance Intent
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {purposes.map((p) => (
           <PurposeCard
             key={p.type}
@@ -122,48 +122,44 @@ const PurposeSelector: React.FC = () => {
       </div>
 
       {purpose && !localBuildMode && (
-        <div className="bg-white p-5 rounded-lg shadow-sm border mt-6">
-          <h3 className="text-xl font-semibold mb-4">How would you like to build your PC?</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card p-10 rounded-2xl border-none mt-12 shadow-2xl"
+        >
+          <h3 className="text-2xl font-bold mb-8">Curation Methodology</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card 
-              className="cursor-pointer hover:shadow-md transition-all"
+              className="cursor-pointer glass-card-hover glass-card border-none p-6"
               onClick={handleAutomaticBuild}
             >
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-full bg-secondary/50 text-tech-purple">
-                    <Wand className="w-5 h-5" />
-                  </div>
-                  <CardTitle className="text-lg">Automatic Build</CardTitle>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-xl bg-tech-purple/10 text-tech-purple">
+                  <Wand className="w-6 h-6" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Let AI choose the best components based on your requirements
-                </CardDescription>
-              </CardContent>
+                <CardTitle className="text-xl">AI Synthesis</CardTitle>
+              </div>
+              <CardDescription className="text-base leading-relaxed font-medium">
+                Allow the curation engine to architect the optimal component ecosystem based on your performance intent.
+              </CardDescription>
             </Card>
 
             <Card 
-              className="cursor-pointer hover:shadow-md transition-all"
+              className="cursor-pointer glass-card-hover glass-card border-none p-6"
               onClick={handleManualBuild}
             >
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-full bg-secondary/50 text-tech-purple">
-                    <Sliders className="w-5 h-5" />
-                  </div>
-                  <CardTitle className="text-lg">Manual Customization</CardTitle>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-xl bg-tech-purple/10 text-tech-purple">
+                  <Sliders className="w-6 h-6" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  Personally select each component for a fully customized build
-                </CardDescription>
-              </CardContent>
+                <CardTitle className="text-xl">Manual Control</CardTitle>
+              </div>
+              <CardDescription className="text-base leading-relaxed font-medium">
+                Exercise full architectural authority and personally select each institutional-grade component.
+              </CardDescription>
             </Card>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

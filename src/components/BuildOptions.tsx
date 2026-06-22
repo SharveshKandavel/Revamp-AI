@@ -91,107 +91,107 @@ const BuildOptions: React.FC = () => {
   const isProfessional = assemblyOption === "professional";
 
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="text-xl">How would you like to build your PC?</CardTitle>
-        <CardDescription>
-          Choose whether you want to build it yourself or have a professional do it
+    <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
+      <CardHeader className="px-8 pt-8">
+        <CardTitle className="text-2xl font-bold tracking-tight">Deployment Strategy</CardTitle>
+        <CardDescription className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">
+          Select your preferred assembly protocol
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent className="px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div 
-            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+            className={`p-6 rounded-2xl cursor-pointer transition-all duration-500 relative overflow-hidden ${
               assemblyOption === "self" 
-                ? "border-tech-purple bg-tech-purple/5 ring-1 ring-tech-purple" 
-                : "border-gray-200 hover:border-gray-300"
+                ? "glass-card border-none ring-2 ring-tech-purple shadow-xl" 
+                : "glass-card-hover glass-card border-none opacity-60 hover:opacity-100"
             }`}
             onClick={() => setAssemblyOption("self")}
           >
-            <div className="flex items-start gap-3 mb-2">
-              <div className={`p-2 rounded-full ${
-                assemblyOption === "self" ? "bg-tech-purple text-white" : "bg-gray-100 text-gray-500"
+            <div className="flex items-start gap-4 mb-4 relative z-10">
+              <div className={`p-3 rounded-xl transition-colors ${
+                assemblyOption === "self" ? "bg-tech-purple text-white" : "bg-tech-purple/10 text-tech-purple"
               }`}>
-                <Wrench className="w-5 h-5" />
+                <Wrench className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-medium">Build it yourself</h3>
-                <p className="text-sm text-gray-600">
-                  We'll help you find all parts online and you can assemble the PC
+                <h3 className="font-bold text-lg dark:text-white leading-tight">Autonomous Assembly</h3>
+                <p className="text-xs font-medium text-gray-400 mt-1 leading-relaxed">
+                  Manual integration of all components via verified digital blueprints.
                 </p>
               </div>
             </div>
-            <div className="ml-10 text-sm">
-              <span className="font-medium text-tech-green">Potential savings:</span> ₹1,500+
+            <div className="ml-14 text-[10px] font-black uppercase tracking-widest text-green-500 relative z-10">
+              Efficiency Gain: ₹1,500+
             </div>
           </div>
 
           <div 
-            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+            className={`p-6 rounded-2xl cursor-pointer transition-all duration-500 relative overflow-hidden ${
               assemblyOption === "professional" 
-                ? "border-tech-purple bg-tech-purple/5 ring-1 ring-tech-purple" 
-                : "border-gray-200 hover:border-gray-300"
+                ? "glass-card border-none ring-2 ring-tech-purple shadow-xl" 
+                : "glass-card-hover glass-card border-none opacity-60 hover:opacity-100"
             }`}
             onClick={() => setAssemblyOption("professional")}
           >
-            <div className="flex items-start gap-3 mb-2">
-              <div className={`p-2 rounded-full ${
-                assemblyOption === "professional" ? "bg-tech-purple text-white" : "bg-gray-100 text-gray-500"
+            <div className="flex items-start gap-4 mb-4 relative z-10">
+              <div className={`p-3 rounded-xl transition-colors ${
+                assemblyOption === "professional" ? "bg-tech-purple text-white" : "bg-tech-purple/10 text-tech-purple"
               }`}>
-                <User className="w-5 h-5" />
+                <User className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-medium">Professional assembly</h3>
-                <p className="text-sm text-gray-600">
-                  Have an experienced PC builder assemble it for you
+                <h3 className="font-bold text-lg dark:text-white leading-tight">Expert Synthesis</h3>
+                <p className="text-xs font-medium text-gray-400 mt-1 leading-relaxed">
+                  Institutional-grade assembly by certified hardware architects.
                 </p>
               </div>
             </div>
             
-            <div className="ml-10 text-sm mb-2">
-              <span className="font-medium text-tech-purple">Service fee:</span> ₹1,500
+            <div className="ml-14 text-[10px] font-black uppercase tracking-widest text-tech-purple relative z-10">
+              Service Allocation: ₹1,500
             </div>
             
             {assemblyOption === "professional" && (
-              <div className="ml-10 mt-3 flex items-center gap-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+              <div className="ml-14 mt-4 flex items-center gap-2 text-[9px] font-bold text-gray-400 bg-white/5 p-2 rounded-lg relative z-10 border border-white/5">
                 <MapPin className="w-3 h-3 text-tech-purple" />
-                <span>We'll match you with a local certified builder</span>
+                <span className="uppercase tracking-tighter">Matching with local certified node...</span>
               </div>
             )}
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col space-y-3">
-        <div className="w-full flex justify-between items-center py-2 border-t border-gray-100 mt-2">
-          <span className="text-gray-600">Parts Subtotal:</span>
-          <span className="font-medium">₹{totalPrice.toLocaleString()}</span>
+      <CardFooter className="flex flex-col gap-3 px-8 pb-8 pt-6 border-t border-white/10 bg-white/5">
+        <div className="w-full flex justify-between items-center py-2">
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Parts Subtotal</span>
+          <span className="font-bold dark:text-white">₹{totalPrice.toLocaleString()}</span>
         </div>
         
         {assemblyOption && (
           <div className="w-full flex justify-between items-center py-2">
-            <span className="text-gray-600">
-              {assemblyOption === "self" ? "Assembly Savings:" : "Professional Service Fee:"}
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              {assemblyOption === "self" ? "Assembly Efficiency" : "Professional Allocation"}
             </span>
-            <span className={`font-medium ${assemblyOption === "self" ? "text-tech-green" : "text-tech-purple"}`}>
+            <span className={`font-bold ${assemblyOption === "self" ? "text-green-500" : "text-tech-purple"}`}>
               {assemblyOption === "self" ? "- ₹1,500+" : "+ ₹1,500"}
             </span>
           </div>
         )}
         
-        <div className="w-full flex justify-between items-center py-2 border-t border-gray-100">
-          <span className="font-medium">Estimated Total:</span>
-          <span className="text-xl font-bold text-tech-dark">
+        <div className="w-full flex justify-between items-center py-4 border-t border-white/5">
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Final Valuation</span>
+          <span className="text-3xl font-black text-tech-dark dark:text-white">
             ₹{(totalPrice + (assemblyOption === "professional" ? 1500 : 0)).toLocaleString()}
           </span>
         </div>
         
         <button 
-          className={`w-full py-3 rounded-md flex items-center justify-center gap-2 transition-all font-medium ${
+          className={`w-full h-14 rounded-xl flex items-center justify-center gap-3 transition-all font-black uppercase tracking-widest text-xs ${
             isSubmitting ? "bg-gray-400 cursor-not-allowed" : 
             isProfessional ? "bg-tech-purple hover:bg-tech-purple/90 text-white" : 
-            "bg-tech-accent hover:bg-tech-accent/90 text-white"
+            "bg-tech-dark hover:bg-black text-white"
           }`}
           onClick={handlePlaceOrder}
           disabled={isSubmitting}
@@ -203,7 +203,7 @@ const BuildOptions: React.FC = () => {
           ) : (
             <ShoppingCart className="w-5 h-5" />
           )}
-          <span>{isProfessional ? "Request Professional Build" : "Shop for These Parts"}</span>
+          <span>{isProfessional ? "Initialize Professional Request" : "Acquire Component List"}</span>
         </button>
       </CardFooter>
     </Card>

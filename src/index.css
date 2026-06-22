@@ -100,10 +100,6 @@
 }
 
 @layer utilities {
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg;
-  }
-  
   .tech-gradient {
     @apply bg-gradient-to-r from-tech-blue to-tech-purple text-white;
   }
@@ -112,6 +108,14 @@
     @apply transition-transform duration-200 hover:scale-[1.02];
   }
   
+  .glass-card {
+    @apply bg-white/40 dark:bg-slate-950/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+
+  .glass-card-hover {
+    @apply transition-all duration-500 hover:bg-white/60 dark:hover:bg-slate-900/60 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] hover:-translate-y-1;
+  }
+
   .fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }

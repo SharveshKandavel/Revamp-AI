@@ -1,51 +1,35 @@
 import { supabase } from './supabase';
 
 /**
- * Normalizes Rainforest API product data into our Supabase schema.
- * @param rawProduct The JSON object returned by Rainforest API
- * @param category The PartCategory this product belongs to
+ * Normalizes a Rainforest API search result into our Supabase product schema.
+ * Works with the lightweight search-result format (from type=search).
+ * 
+ * The backend handles all Rainforest API calls directly.
+ * This utility is for any client-side normalization if needed.
  */
-export async function ingestRainforestProduct(rawProduct: any, category: string) {
+export async function ingestSearchResult(result: any, category: string) {
   try {
-    const asin = rawProduct.asin;
-    const title = rawProduct.title;
-    const manufacturer = rawProduct.brand;
-    const image = rawProduct.main_image?.link || '/placeholder.svg';
-    const priceCents = rawProduct.buybox_winner?.price?.value 
-      ? Math.round(rawProduct.buybox_winner.price.value * 100) 
-      : null;
+    const asin = result.asin;
+    if (!asin) throw new Error('Missing ASIN');
 
-    // Extract hardware-specific specs from specifications array
-    const specs: Record<string, any> = {};
-    if (rawProduct.specifications) {
-      rawProduct.specifications.forEach((spec: any) => {
-        const name = spec.name.toLowerCase();
-        const value = spec.value;
-        
-        // General mapping
-        if (name.includes('socket') || name.includes('chipset')) specs.socket = value;
-        if (name.includes('wattage') || name.includes('draw')) specs.tdp_watts = parseInt(value);
-        if (name.includes('form factor')) specs.form_factor = value;
-        if (name.includes('cores')) specs.cores = parseInt(value);
-        if (name.includes('threads')) specs.threads = parseInt(value);
-        if (name.includes('base clock')) specs.baseClock = value;
-        if (name.includes('boost clock')) specs.boostClock = value;
-        
-        // Capture raw specs for backup
-        specs[spec.name] = value;
-      });
-    }
+    // Search results have a simpler structure than full product details
+    const priceCents = result.price?.value
+      ? Math.round(result.price.value * 100)
+      : (result.current_price_cents || null);
 
     const productData = {
       asin,
-      name: title,
+      name: result.title || result.name || 'Unknown Product',
       category,
-      manufacturer,
+      manufacturer: result.brand || result.manufacturer || 'Unknown',
       price: priceCents ? priceCents / 100 : 0,
       current_price_cents: priceCents,
-      image_url: image,
-      specs,
-      amazon_url: rawProduct.link,
+      image_url: result.image || result.main_image?.link || '/placeholder.svg',
+      specs: {
+        rating: result.rating || null,
+        reviews_count: result.ratings_total || null,
+      },
+      amazon_url: result.link || result.amazon_url || '',
       last_updated: new Date().toISOString(),
     };
 
@@ -54,10 +38,30 @@ export async function ingestRainforestProduct(rawProduct: any, category: string)
       .upsert(productData, { onConflict: 'asin' });
 
     if (error) throw error;
-    
+
     return productData;
   } catch (err) {
-    console.error('Failed to ingest Rainforest product:', err);
+    console.error('Failed to ingest search result:', err);
     throw err;
   }
 }
+
+/**
+ * Check how many products exist for a category in the local DB.
+ * Useful for deciding whether to trigger a sync.
+ */
+export async function getCategoryProductCount(category: string): Promise<number> {
+  try {
+    const { count, error } = await supabase
+      .from('products')
+      .select('id', { count: 'exact', head: true })
+      .eq('category', category);
+
+    if (error) throw error;
+    return count || 0;
+  } catch (err) {
+    console.error(`Failed to count products for ${category}:`, err);
+    return 0;
+  }
+}
+

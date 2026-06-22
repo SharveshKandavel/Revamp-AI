@@ -34,16 +34,16 @@ const MainContent = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <motion.div 
-            className="text-center mb-12"
+            className="text-center mb-16"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-tech-dark mb-4 bg-gradient-to-r from-tech-purple to-tech-blue text-transparent bg-clip-text">
-              Transform Your PC Build
+            <h1 className="text-5xl md:text-6xl font-bold text-tech-dark dark:text-white mb-6 tracking-tight">
+              Architecture for <span className="text-tech-purple">Performance</span>
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Revamp your tech experience with AI-powered PC part selection and recommendations
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium">
+              Precision hardware curation and technical assembly for the modern ecosystem.
             </p>
           </motion.div>
 
@@ -54,6 +54,26 @@ const MainContent = () => {
               transition={{ delay: 0.2, duration: 0.5 }}
             >
               <UserTypeSelector onSelectUserType={setUserType} />
+            </motion.div>
+          )}
+
+          {userType && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-8"
+            >
+              <Button 
+                variant="ghost" 
+                onClick={() => setUserType(null)}
+                className="flex items-center gap-2 text-gray-500 hover:text-tech-purple transition-colors p-0"
+              >
+                <motion.div
+                  whileHover={{ x: -4 }}
+                >
+                  ← Back to Selection
+                </motion.div>
+              </Button>
             </motion.div>
           )}
 
@@ -109,63 +129,29 @@ const MainContent = () => {
 
           {userType === "seller" && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="p-8 bg-white rounded-xl shadow-lg border border-gray-100 text-center"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="p-16 glass-card border-none shadow-2xl text-center rounded-[3rem]"
             >
-              <div className="w-20 h-20 bg-tech-purple/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ShoppingCart className="w-10 h-10 text-tech-purple" />
-              </div>
-              <h2 className="text-3xl font-bold mb-4 text-tech-dark">Seller Dashboard</h2>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Manage your PC parts inventory, track sales, and connect with builders across the platform.
+              <ShoppingCart className="w-16 h-16 text-tech-purple mx-auto mb-10 opacity-80" />
+              <h2 className="text-5xl font-bold mb-8 text-tech-dark dark:text-white tracking-tight">Commercial Terminal</h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-xl mx-auto leading-relaxed font-medium">
+                Oversee boutique inventory, facilitate high-fidelity commerce, and manage institutional supply chains.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button 
                   onClick={() => window.location.href = "/seller"}
-                  className="bg-tech-purple hover:bg-tech-purple/90 px-8 py-6 text-lg"
+                  className="bg-tech-dark hover:bg-black text-white h-16 px-12 text-lg rounded-full transition-all duration-500 hover:-translate-y-1 font-bold uppercase tracking-wider"
                 >
-                  Go to Seller Dashboard
+                  Enter Workspace
                 </Button>
                 <Button 
                   variant="outline"
                   onClick={() => setUserType(null)}
-                  className="px-8 py-6 text-lg"
+                  className="h-16 px-12 text-lg rounded-full glass-card border-none hover:bg-white/60 transition-all duration-500 hover:-translate-y-1 font-bold uppercase tracking-wider"
                 >
-                  Change User Type
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {userType === "builder" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="p-8 bg-white rounded-xl shadow-lg border border-gray-100 text-center"
-            >
-              <div className="w-20 h-20 bg-tech-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Wrench className="w-10 h-10 text-tech-blue" />
-              </div>
-              <h2 className="text-3xl font-bold mb-4 text-tech-dark">PC Builder Dashboard</h2>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                Access your build queue, view client requests, and manage your professional assembly profile.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button 
-                  onClick={() => window.location.href = "/builder"}
-                  className="bg-tech-blue hover:bg-tech-blue/90 px-8 py-6 text-lg"
-                >
-                  Go to Builder Dashboard
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => setUserType(null)}
-                  className="px-8 py-6 text-lg"
-                >
-                  Change User Type
+                  Switch Role
                 </Button>
               </div>
             </motion.div>

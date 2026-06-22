@@ -39,8 +39,6 @@ const Header: React.FC<HeaderProps> = () => {
   if (isAuthenticated) {
     if (user?.role === "seller") {
       navItems.push({ name: "Seller Dashboard", path: "/seller" });
-    } else if (user?.role === "builder") {
-      navItems.push({ name: "Builder Dashboard", path: "/builder" });
     }
   }
 
@@ -55,16 +53,14 @@ const Header: React.FC<HeaderProps> = () => {
         return 'PC Enthusiast';
       case 'seller':
         return 'Parts Seller';
-      case 'builder':
-        return 'PC Builder';
       default:
         return 'Guest';
     }
   };
 
   return (
-    <header className="w-full sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
-      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center py-4">
+    <header className="w-full sticky top-0 z-50 glass-card">
+      <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center py-4 px-4">
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -135,7 +131,7 @@ const Header: React.FC<HeaderProps> = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to={user?.role === 'seller' ? '/seller' : user?.role === 'builder' ? '/builder' : '/'}>
+                  <Link to={user?.role === 'seller' ? '/seller' : '/'}>
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
@@ -151,8 +147,8 @@ const Header: React.FC<HeaderProps> = () => {
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/login">Login</Link>
               </Button>
-              <Button size="sm" className="bg-tech-purple hover:bg-tech-purple/90" asChild>
-                <Link to="/signup">Sign Up</Link>
+              <Button size="sm" className="bg-tech-dark hover:bg-black text-white px-6 rounded-full font-bold uppercase tracking-wider text-[10px]" asChild>
+                <Link to="/signup">Sign-up</Link>
               </Button>
             </div>
           )}
@@ -181,7 +177,7 @@ const Header: React.FC<HeaderProps> = () => {
                     <>
                       <DropdownMenuSeparator />
                       <Link to="/login" className="px-4 py-2 text-sm">Login</Link>
-                      <Link to="/signup" className="px-4 py-2 text-sm font-medium text-tech-purple">Sign Up</Link>
+                      <Link to="/signup" className="px-4 py-2 text-sm font-medium text-tech-purple">Sign-up</Link>
                     </>
                   )}
                 </nav>

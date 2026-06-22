@@ -257,14 +257,14 @@ const SellerDashboardContent = () => {
           </div>
 
           <Tabs defaultValue="products" className="mb-10">
-            <TabsList className="mb-6">
-              <TabsTrigger value="products">My Products</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsList className="mb-6 bg-white/40 backdrop-blur-md p-1 rounded-xl">
+              <TabsTrigger value="products" className="rounded-lg">My Products</TabsTrigger>
+              <TabsTrigger value="analytics" className="rounded-lg">Analytics</TabsTrigger>
+              <TabsTrigger value="orders" className="rounded-lg">Orders</TabsTrigger>
             </TabsList>
             
             <TabsContent value="products">
-              <Card>
+              <Card className="glass-card border-none shadow-xl">
                 <CardHeader>
                   <CardTitle>Inventory Management</CardTitle>
                   <CardDescription>Manage your PC parts and components inventory</CardDescription>
@@ -273,12 +273,12 @@ const SellerDashboardContent = () => {
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Search products..."
-                        className="pl-8"
+                        className="pl-8 bg-white/20 border-white/20"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
-                    <Button onClick={handleOpenAdd} className="ml-4 bg-tech-purple hover:bg-tech-purple/90">
+                    <Button onClick={handleOpenAdd} className="ml-4 bg-tech-dark hover:bg-black text-white rounded-full px-6">
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Add Product
                     </Button>
@@ -426,23 +426,23 @@ const SellerDashboardContent = () => {
           </Tabs>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] glass-card border-none shadow-2xl rounded-3xl">
               <DialogHeader>
-                <DialogTitle>{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
-                <DialogDescription>Enter the details of the PC component here.</DialogDescription>
+                <DialogTitle className="text-2xl font-bold tracking-tight text-tech-dark dark:text-white">{editingProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
+                <DialogDescription className="font-medium text-gray-500">Configure component metadata for the hardware catalog.</DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">Name</Label>
-                  <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="col-span-3" />
+              <form onSubmit={handleSubmit} className="grid gap-6 py-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-xs font-black uppercase tracking-widest text-gray-400">Product Designation</Label>
+                  <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-white/20 border-white/20" />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="category" className="text-right">Category</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-xs font-black uppercase tracking-widest text-gray-400">Inventory Category</Label>
                   <Select value={formData.category} onValueChange={(val) => setFormData({ ...formData, category: val })}>
-                    <SelectTrigger className="col-span-3">
+                    <SelectTrigger className="bg-white/20 border-white/20">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-none">
                       <SelectItem value="CPU">CPU</SelectItem>
                       <SelectItem value="GPU">GPU</SelectItem>
                       <SelectItem value="Motherboard">Motherboard</SelectItem>
@@ -454,16 +454,20 @@ const SellerDashboardContent = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="price" className="text-right">Price (₹)</Label>
-                  <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="col-span-3" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="price" className="text-xs font-black uppercase tracking-widest text-gray-400">Valuation (₹)</Label>
+                    <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="bg-white/20 border-white/20" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stock" className="text-xs font-black uppercase tracking-widest text-gray-400">Inventory Count</Label>
+                    <Input id="stock" type="number" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} className="bg-white/20 border-white/20" />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="stock" className="text-right">Stock</Label>
-                  <Input id="stock" type="number" value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: e.target.value })} className="col-span-3" />
-                </div>
-                <DialogFooter>
-                  <Button type="submit">{editingProduct ? "Save Changes" : "Add Product"}</Button>
+                <DialogFooter className="pt-4">
+                  <Button type="submit" className="w-full bg-tech-dark hover:bg-black text-white rounded-full h-12 font-black uppercase tracking-widest text-xs">
+                    {editingProduct ? "Update Designation" : "Commit to Inventory"}
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -476,16 +480,16 @@ const SellerDashboardContent = () => {
 };
 
 const StatsCard = ({ title, value, icon, change }: { title: string, value: string | number, icon: React.ReactNode, change: string }) => (
-  <Card className="hover-scale">
+  <Card className="glass-card border-none shadow-lg glass-card-hover">
     <CardHeader className="flex flex-row items-center justify-between pb-2">
-      <CardTitle className="text-lg font-medium">{title}</CardTitle>
+      <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-400">{title}</CardTitle>
       {icon}
     </CardHeader>
     <CardContent>
-      <div className="text-2xl font-bold">{value}</div>
-      <p className="text-sm text-green-600 flex items-center mt-1">
+      <div className="text-3xl font-black text-tech-dark dark:text-white">{value}</div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-green-500 flex items-center mt-2">
         {change}
-        <TrendingUp className="h-4 w-4 ml-1" />
+        <TrendingUp className="h-3 w-3 ml-1" />
       </p>
     </CardContent>
   </Card>

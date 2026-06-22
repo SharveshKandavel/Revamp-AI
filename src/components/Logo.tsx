@@ -21,13 +21,9 @@ const Logo: React.FC<LogoProps> = ({
 
   return (
     <Link to="/" className={`flex items-center gap-2 ${className}`}>
-      <div className={`${sizeClasses[size]} bg-tech-purple rounded-lg flex items-center justify-center text-white font-bold shadow-lg`}>
-        R
-      </div>
-      
       {showText && (
-        <span className="font-bold bg-gradient-to-r from-tech-purple to-tech-accent bg-clip-text text-transparent">
-          Revamp AI
+        <span className="font-bold text-tech-dark dark:text-white">
+          Revamp
         </span>
       )}
     </Link>

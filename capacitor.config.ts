@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.revampai.pcbuilder',
-  appName: 'Revamp AI PC Builder',
+  appName: 'Revamp PC Builder',
   webDir: 'dist',
   server: {
     androidScheme: 'https',
@@ -26,7 +26,7 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: false
   },
   ios: {
-    scheme: 'Revamp AI PC Builder',
+    scheme: 'Revamp PC Builder',
     contentInset: 'always'
   }
 };

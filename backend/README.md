@@ -1,4 +1,4 @@
-# Revamp AI - FastAPI Backend
+# Revamp - FastAPI Backend
 
 This backend service handles data synchronization between the Amazon Rainforest API and the Supabase database.
 

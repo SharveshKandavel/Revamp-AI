@@ -30,7 +30,7 @@ const Signup = () => {
       toast.success(`Account created! Please check your email for confirmation.`);
       navigate("/login");
     } catch (error: any) {
-      toast.error(error.message || "Signup failed");
+      toast.error(error.message || "Sign-up failed");
     }
   };
 
@@ -44,7 +44,7 @@ const Signup = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Create an Account</CardTitle>
           <CardDescription className="text-center">
-            Join Revamp AI to start building or selling
+            Join Revamp to start building or selling
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -89,14 +89,13 @@ const Signup = () => {
                 <SelectContent>
                   <SelectItem value="customer">Build a PC</SelectItem>
                   <SelectItem value="seller">Sell PC Components</SelectItem>
-                  <SelectItem value="builder">Work as a Pro Builder</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full bg-tech-purple hover:bg-tech-purple/90" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Sign Up"}
+              {isLoading ? "Creating account..." : "Sign-up"}
             </Button>
             <div className="text-sm text-center text-gray-500">
               Already have an account?{" "}

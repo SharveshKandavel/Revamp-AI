@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Cpu, ShoppingCart, Wrench } from "lucide-react";
+import { Cpu, Wrench, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import {
@@ -37,21 +37,22 @@ const UserTypeCard: React.FC<UserTypeCardProps> = ({
   <motion.div
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
+    className="h-full"
   >
     <Card 
-      className="cursor-pointer transition-all hover:shadow-md"
+      className="cursor-pointer h-full glass-card glass-card-hover border-none"
       onClick={onClick}
     >
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-full bg-secondary/50 text-tech-purple">
+          <div className="p-2 rounded-full bg-tech-purple/10 text-tech-purple">
             {icon}
           </div>
           <CardTitle className="text-xl">{title}</CardTitle>
         </div>
       </CardHeader>
       <CardContent>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="text-base font-medium">{description}</CardDescription>
       </CardContent>
     </Card>
   </motion.div>
@@ -59,31 +60,24 @@ const UserTypeCard: React.FC<UserTypeCardProps> = ({
 
 const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType }) => {
   const navigate = useNavigate();
-  const { user, updateRole, isAuthenticated } = useAuth();
+  const { updateRole, isAuthenticated } = useAuth();
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingType, setPendingType] = useState<{ type: string; route: string | null } | null>(null);
 
   const userTypes = [
     {
       type: "customer",
-      title: "PC Enthusiast",
-      description: "Find and build the perfect PC for your needs",
+      title: "Enthusiast",
+      description: "Architect and curate the optimal computing system for your unique performance requirements.",
       icon: <Cpu className="w-5 h-5" />,
       route: null
     },
     {
       type: "seller",
-      title: "Parts Seller",
-      description: "Sell PC parts and components on our platform",
+      title: "Seller",
+      description: "Manage a boutique inventory of elite components and facilitate high-fidelity commerce.",
       icon: <ShoppingCart className="w-5 h-5" />,
       route: "/seller"
-    },
-    {
-      type: "builder",
-      title: "PC Builder",
-      description: "Help others assemble their custom PCs",
-      icon: <Wrench className="w-5 h-5" />,
-      route: "/builder"
     }
   ];
 
@@ -124,12 +118,11 @@ const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType })
   };
 
   return (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-tech-dark mb-4 flex items-center">
-        <span className="mr-2">👋</span>
-        How would you like to use Revamp AI?
+    <div className="mb-12">
+      <h2 className="text-3xl font-bold text-tech-dark dark:text-white mb-8">
+        Select Workspace
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
         {userTypes.map((type) => (
           <UserTypeCard
             key={type.type}
@@ -142,21 +135,21 @@ const UserTypeSelector: React.FC<UserTypeSelectorProps> = ({ onSelectUserType })
       </div>
 
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-3xl p-8">
           <AlertDialogHeader>
-            <AlertDialogTitle>Switch to Parts Seller Account?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to switch your account type to Parts Seller? 
-              This will give you access to the inventory management dashboard and sales tools.
+            <AlertDialogTitle className="text-2xl font-bold">Initialize Seller Profile?</AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              Are you prepared to oversee boutique inventory and facilitate elite commercial operations? 
+              This will reconfigure your terminal for institutional commerce tools.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPendingType(null)}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="mt-6">
+            <AlertDialogCancel onClick={() => setPendingType(null)} className="rounded-full px-8">Return</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmSwitch}
-              className="bg-tech-purple hover:bg-tech-purple/90"
+              className="bg-tech-dark hover:bg-black text-white rounded-full px-8"
             >
-              Confirm & Switch
+              Transition Now
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

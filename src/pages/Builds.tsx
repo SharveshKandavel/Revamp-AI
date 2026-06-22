@@ -72,7 +72,7 @@ const staticBuilds: Build[] = [
 
 const BuildsContent = () => {
   const { user } = useAuth();
-  const { selectPart, setPurpose, setBudget } = useBuildStore();
+  const { selectPart, setPurpose, setBudget, fetchUserBuilds, fetchCommunityBuilds } = useBuildStore();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -91,22 +91,10 @@ const BuildsContent = () => {
     setError(null);
     try {
       if (activeTab === "community") {
-        const { data, error } = await supabase
-          .from('builds')
-          .select('*')
-          .eq('is_public', true)
-          .order('likes', { ascending: false });
-        
-        if (error) throw error;
+        const data = await fetchCommunityBuilds();
         setCommunityBuilds(data || []);
       } else if (user) {
-        const { data, error } = await supabase
-          .from('builds')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
+        const data = await fetchUserBuilds(user.id);
         setMyBuilds(data || []);
       }
     } catch (err: any) {
@@ -162,7 +150,7 @@ const BuildsContent = () => {
     if (navigator.share) {
       navigator.share({
         title,
-        text: `Check out this PC build on Revamp AI: ${title}`,
+        text: `Check out this PC build on Revamp: ${title}`,
         url: window.location.href,
       }).catch(() => {});
     } else {

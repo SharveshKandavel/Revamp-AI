@@ -7,11 +7,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SellerDashboard from "./pages/SellerDashboard";
-import BuilderDashboard from "./pages/BuilderDashboard";
-import BuilderTools from "./pages/builder/BuilderTools";
-import BuilderAnalytics from "./pages/builder/BuilderAnalytics";
-import BuilderClients from "./pages/builder/BuilderClients";
-import BuilderSettings from "./pages/builder/BuilderSettings";
 import Builds from "./pages/Builds";
 import Guides from "./pages/Guides";
 import Login from "./pages/Login";
@@ -34,7 +29,7 @@ const ProtectedRoute = ({ children, allowedRole }: { children: React.ReactNode, 
 
 const AppContent = () => {
   useEffect(() => {
-    document.title = "Revamp AI PC Builder";
+    document.title = "Revamp PC Builder";
     
     // Initialize mobile app features
     const initApp = async () => {
@@ -62,32 +57,6 @@ const AppContent = () => {
             <Route path="/seller" element={
               <ProtectedRoute allowedRole="seller">
                 <SellerDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/builder" element={
-              <ProtectedRoute allowedRole="builder">
-                <BuilderDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/builder/tools" element={
-              <ProtectedRoute allowedRole="builder">
-                <BuilderTools />
-              </ProtectedRoute>
-            } />
-            <Route path="/builder/analytics" element={
-              <ProtectedRoute allowedRole="builder">
-                <BuilderAnalytics />
-              </ProtectedRoute>
-            } />
-            <Route path="/builder/clients" element={
-              <ProtectedRoute allowedRole="builder">
-                <BuilderClients />
-              </ProtectedRoute>
-            } />
-            <Route path="/builder/settings" element={
-              <ProtectedRoute allowedRole="builder">
-                <BuilderSettings />
               </ProtectedRoute>
             } />
             

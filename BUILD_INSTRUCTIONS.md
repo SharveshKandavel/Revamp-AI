@@ -1,6 +1,6 @@
 # Mobile App Build Instructions
 
-This document provides step-by-step instructions to build and publish the Revamp AI PC Builder mobile app to the Google Play Store.
+This document provides step-by-step instructions to build and publish the Revamp PC Builder mobile app to the Google Play Store.
 
 ## Prerequisites
 
@@ -86,7 +86,7 @@ npx cap sync android
    - Go to Google Play Console
    - Create new application
    - Fill in app details:
-     - App name: "Revamp AI PC Builder"
+     - App name: "Revamp PC Builder"
      - Short description: "Build your dream PC with AI recommendations"
      - Full description: [Use detailed description from manifest]
      - Category: "Tools" or "Productivity"
