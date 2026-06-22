@@ -11,7 +11,6 @@ import CompatibilityCheck from "@/components/CompatibilityCheck";
 import BuildSummary from "@/components/BuildSummary";
 import BuildOptions from "@/components/BuildOptions";
 import BuildCompatibilityVisualizer from "@/components/BuildCompatibilityVisualizer";
-import BuildVisualizer3D from "@/components/BuildVisualizer3D";
 import PowerConsumptionCalculator from "@/components/PowerConsumptionCalculator";
 import { motion } from "framer-motion";
 import { useBuildStore } from "@/store/useBuildStore";
@@ -103,7 +102,6 @@ const MainContent = () => {
                 <PartsPicker />
               </motion.div>
               
-              <BuildVisualizer3D />
               <BuildCompatibilityVisualizer />
               <PowerConsumptionCalculator />
               <CompatibilityCheck />

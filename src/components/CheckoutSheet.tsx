@@ -6,6 +6,19 @@ import { getAffiliateLink, formatAmazonPrice } from "@/utils/amazonUtils";
 import { ExternalLink, ShoppingCart, X, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const AMAZON_TAG = 'revampai-20';
+
+// Builds the best available buy URL for a part:
+// 1. Direct ASIN link (most accurate)
+// 2. Stored amazon_url
+// 3. Search fallback using brand + name (always works for mock data)
+const getPartBuyUrl = (part: { asin?: string; amazon_url?: string; brand: string; name: string }): string => {
+  if (part.asin) return getAffiliateLink(part.asin);
+  if (part.amazon_url) return part.amazon_url;
+  const query = encodeURIComponent(`${part.brand} ${part.name}`);
+  return `https://www.amazon.ca/s?k=${query}&tag=${AMAZON_TAG}`;
+};
+
 const categoryNames: Record<PartCategory, string> = {
   CPU: "Processor",
   GPU: "Graphics Card",
@@ -78,9 +91,7 @@ const CheckoutSheet: React.FC<CheckoutSheetProps> = ({ open, onClose }) => {
             {/* Parts List */}
             <div className="overflow-y-auto flex-1 px-4 py-4 space-y-3">
               {selected.map(([category, part]) => {
-                const buyUrl = part.asin
-                  ? getAffiliateLink(part.asin)
-                  : part.amazon_url ?? null;
+                const buyUrl = getPartBuyUrl(part);
 
                 const displayPrice = part.current_price_cents
                   ? formatAmazonPrice(part.current_price_cents)
@@ -104,21 +115,15 @@ const CheckoutSheet: React.FC<CheckoutSheetProps> = ({ open, onClose }) => {
                       </div>
                     </div>
 
-                    {buyUrl ? (
-                      <a
-                        href={buyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="shrink-0 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-colors"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        Buy
-                      </a>
-                    ) : (
-                      <span className="shrink-0 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                        Link unavailable
-                      </span>
-                    )}
+                    <a
+                      href={buyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Buy
+                    </a>
                   </div>
                 );
               })}
