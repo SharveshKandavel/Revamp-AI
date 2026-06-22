@@ -112,7 +112,7 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
               }}
             >
               <ExternalLink className="w-3 h-3" />
-              Inventory Link
+              Buy
             </Button>
           )}
         </CardFooter>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
@@ -7,6 +7,7 @@ import { Check, ExternalLink, HardDrive, Layers, MonitorSmartphone, Package, Plu
 import { PartCategory } from "@/data/parts/types";
 import { toast } from "sonner";
 import { getAffiliateLink, formatAmazonPrice } from "@/utils/amazonUtils";
+import CheckoutSheet from "@/components/CheckoutSheet";
 
 const categoryIcons: Record<PartCategory, React.ReactNode> = {
   CPU: <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><path d="M15 2v2M15 20v2M2 15h2M20 15h2M2 9h2M20 9h2M9 2v2M9 20v2" /></svg>,
@@ -34,6 +35,7 @@ const BuildSummary: React.FC = () => {
   const { selectedParts, compatibilityResult } = useBuildStore();
   const totalPrice = useTotalPrice();
   const { user, isAuthenticated } = useAuth();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
@@ -144,7 +146,7 @@ const BuildSummary: React.FC = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-2 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl text-amber-600 transition-colors"
-                          title="View on Amazon"
+                          title="View product"
                           onClick={(e) => e.stopPropagation()}
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -204,16 +206,10 @@ const BuildSummary: React.FC = () => {
       <CardFooter className="flex flex-col gap-3 px-8 pb-8 pt-6 border-t border-white/10 bg-white/5">
         <Button 
           className="w-full bg-amber-500 hover:bg-amber-600 text-white h-14 rounded-xl flex items-center justify-center gap-3 transition-all font-black uppercase tracking-widest text-xs"
-          asChild
+          onClick={() => setCheckoutOpen(true)}
         >
-          <a 
-            href={`https://www.amazon.ca/s?k=pc+parts+${performanceLevel.level.toLowerCase()}&tag=revampai-20`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLink className="w-5 h-5" />
-            Complete Selection on Amazon
-          </a>
+          <ShoppingCart className="w-5 h-5" />
+          View & Purchase Components
         </Button>
         <button 
           onClick={handleSaveBuild}
@@ -224,6 +220,7 @@ const BuildSummary: React.FC = () => {
         </button>
       </CardFooter>
       </Card>
+      <CheckoutSheet open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
     </div>
   );
 };

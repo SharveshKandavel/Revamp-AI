@@ -1,46 +1,17 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
-import { toast } from "sonner";
+import CheckoutSheet from "@/components/CheckoutSheet";
 
 const BuildOptions: React.FC = () => {
   const { selectedParts } = useBuildStore();
   const totalPrice = useTotalPrice();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
-  
-  // Removed early return
-
-  // Generate affiliate links for entire build
-  const getWholeSetupLinks = () => {
-    // Get the names of all selected parts
-    const partNames = Object.values(selectedParts)
-      .filter(Boolean)
-      .map(part => `${part?.brand} ${part?.name}`)
-      .join(' ');
-    
-    const searchQuery = encodeURIComponent(`PC components ${partNames}`);
-    
-    // Using Canada domain and verified tag
-    return `https://www.amazon.ca/s?k=${searchQuery}&tag=revampai-20`;
-  };
-
-  const handlePlaceOrder = () => {
-    setIsSubmitting(true);
-    
-    const amazonUrl = getWholeSetupLinks();
-    window.open(amazonUrl, '_blank');
-    toast.success("Redirecting to Amazon!");
-    
-    // Reset the submitting state
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 500);
-  };
 
   return (
     <div style={{ display: selectedCount < 3 ? 'none' : 'block' }}>
@@ -63,25 +34,19 @@ const BuildOptions: React.FC = () => {
       </CardHeader>
 
       <CardContent className="p-0">
-        <button 
+        <button
           className="w-full h-16 flex items-center justify-center gap-3 transition-all font-black uppercase tracking-widest text-sm bg-tech-purple hover:bg-tech-purple/90 text-white"
-          onClick={handlePlaceOrder}
-          disabled={isSubmitting}
+          onClick={() => setCheckoutOpen(true)}
         >
-          <div className="flex items-center justify-center w-5 h-5">
-            {isSubmitting ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <ShoppingCart className="w-5 h-5" />
-            )}
-          </div>
-          <span>Acquire Component List on Amazon</span>
+          <ShoppingCart className="w-5 h-5" />
+          <span>Acquire Component List</span>
         </button>
       </CardContent>
       </Card>
+
+      <CheckoutSheet open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
     </div>
   );
 };
 
 export default BuildOptions;
-
