@@ -12,10 +12,10 @@ export const isCompatible = (selectedParts: Record<string, Part | null>) => {
 
   if (cpu && motherboard) {
     // Check socket compatibility
-    if (cpu.specs.socket !== motherboard.specs.socket) {
+    if (cpu.specs?.socket !== motherboard.specs?.socket) {
       return {
         compatible: false,
-        message: `CPU socket ${cpu.specs.socket} is not compatible with motherboard socket ${motherboard.specs.socket}`
+        message: `CPU socket ${cpu.specs?.socket} is not compatible with motherboard socket ${motherboard.specs?.socket}`
       };
     }
   }
@@ -23,12 +23,12 @@ export const isCompatible = (selectedParts: Record<string, Part | null>) => {
   if (gpu && monitor) {
     // Check if high-end GPU is paired with a low refresh rate monitor for gaming
     if (gpu.performance >= 8 && 
-        monitor.specs.refreshRate && 
-        parseInt(monitor.specs.refreshRate.toString()) < 120 && 
+        monitor.specs?.refreshRate && 
+        parseInt(monitor.specs?.refreshRate.toString()) < 120 && 
         purpose === 'Gaming') {
       return {
         compatible: false,
-        message: `Your high-performance GPU (${gpu.name}) is bottlenecked by your monitor's refresh rate (${monitor.specs.refreshRate})`
+        message: `Your high-performance GPU (${gpu.name}) is bottlenecked by your monitor's refresh rate (${monitor.specs?.refreshRate})`
       };
     }
   }

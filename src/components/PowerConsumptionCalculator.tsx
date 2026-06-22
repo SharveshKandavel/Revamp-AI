@@ -13,10 +13,10 @@ const PowerConsumptionCalculator = () => {
     let total = 50; // Base system power draw
     
     if (selectedParts.CPU) {
-      total += (selectedParts.CPU.specs.tdp as number) || 0;
+      total += (selectedParts.CPU.specs?.tdp as number) || 0;
     }
     if (selectedParts.GPU) {
-      total += (selectedParts.GPU.specs.tdp as number) || 0;
+      total += (selectedParts.GPU.specs?.tdp as number) || 0;
     }
     
     // Add estimated power for other components
@@ -30,7 +30,7 @@ const PowerConsumptionCalculator = () => {
   const totalPower = calculatePowerConsumption();
   const recommendedPSU = Math.ceil((totalPower * 1.5) / 50) * 50; // Round up to nearest 50W
   
-  const selectedPSUWattage = (selectedParts.PowerSupply?.specs.wattage as number) || 0;
+  const selectedPSUWattage = (selectedParts.PowerSupply?.specs?.wattage as number) || 0;
   const isPSUInsufficient = selectedPSUWattage > 0 && selectedPSUWattage < totalPower;
   const isPSULowHeadroom = selectedPSUWattage > 0 && selectedPSUWattage >= totalPower && selectedPSUWattage < recommendedPSU;
 

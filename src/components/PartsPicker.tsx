@@ -66,7 +66,7 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
         </CardHeader>
         <CardContent className="pb-4 px-6 relative z-10 flex-grow">
           <div className="space-y-2 mt-4">
-            {Object.entries(part.specs).slice(0, 3).map(([key, value]) => (
+            {Object.entries(part.specs || {}).slice(0, 3).map(([key, value]) => (
               <div key={key} className="flex justify-between items-center text-xs">
                 <span className="text-gray-400 uppercase tracking-tighter font-bold">{key}</span>
                 <span className="font-medium truncate ml-4 dark:text-slate-300">{String(value)}</span>
