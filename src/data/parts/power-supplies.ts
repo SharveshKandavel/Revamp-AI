@@ -7,7 +7,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'RM650x',
     brand: 'Corsair',
-    price: 8499,
+    price: 142,
     image: '/placeholder.svg',
     specs: {
       wattage: 650,
@@ -22,7 +22,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'SuperNOVA 850 G6',
     brand: 'EVGA',
-    price: 11999,
+    price: 200,
     image: '/placeholder.svg',
     specs: {
       wattage: 850,
@@ -37,7 +37,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'HX1500i',
     brand: 'Corsair',
-    price: 29999,
+    price: 500,
     image: '/placeholder.svg',
     specs: {
       wattage: 1500,
@@ -52,7 +52,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'Focus GX-750',
     brand: 'Seasonic',
-    price: 9999,
+    price: 167,
     image: '/placeholder.svg',
     specs: {
       wattage: 750,
@@ -67,7 +67,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'ROG Thor 1200P',
     brand: 'ASUS',
-    price: 22999,
+    price: 383,
     image: '/placeholder.svg',
     specs: {
       wattage: 1200,
@@ -82,7 +82,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'SF600',
     brand: 'Corsair',
-    price: 11999,
+    price: 200,
     image: '/placeholder.svg',
     specs: {
       wattage: 600,
@@ -97,7 +97,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'Prime TX-1000',
     brand: 'Seasonic',
-    price: 24999,
+    price: 417,
     image: '/placeholder.svg',
     specs: {
       wattage: 1000,
@@ -112,7 +112,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'CX550F RGB',
     brand: 'Corsair',
-    price: 5999,
+    price: 100,
     image: '/placeholder.svg',
     specs: {
       wattage: 550,
@@ -127,7 +127,7 @@ export const PowerSupplies: Part[] = [
     category: 'PowerSupply',
     name: 'Straight Power 11 850W',
     brand: 'be quiet!',
-    price: 13999,
+    price: 233,
     image: '/placeholder.svg',
     specs: {
       wattage: 850,

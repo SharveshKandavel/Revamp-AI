@@ -7,7 +7,7 @@ export const Cases: Part[] = [
     category: 'Case',
     name: '4000D Airflow',
     brand: 'Corsair',
-    price: 7999,
+    price: 133,
     image: '/placeholder.svg',
     specs: {
       formFactor: 'Mid Tower',
@@ -22,7 +22,7 @@ export const Cases: Part[] = [
     category: 'Case',
     name: 'H510',
     brand: 'NZXT',
-    price: 6499,
+    price: 108,
     image: '/placeholder.svg',
     specs: {
       formFactor: 'Mid Tower',
@@ -37,7 +37,7 @@ export const Cases: Part[] = [
     category: 'Case',
     name: 'Obsidian 1000D',
     brand: 'Corsair',
-    price: 49999,
+    price: 833,
     image: '/placeholder.svg',
     specs: {
       formFactor: 'Super Tower',
@@ -52,7 +52,7 @@ export const Cases: Part[] = [
     category: 'Case',
     name: 'Pure Base 500DX',
     brand: 'be quiet!',
-    price: 8999,
+    price: 150,
     image: '/placeholder.svg',
     specs: {
       formFactor: 'Mid Tower',

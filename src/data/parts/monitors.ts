@@ -7,7 +7,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'Odyssey G7 32"',
     brand: 'Samsung',
-    price: 34999,
+    price: 583,
     image: '/placeholder.svg',
     specs: {
       size: '32"',
@@ -24,7 +24,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'UltraGear 27GL850',
     brand: 'LG',
-    price: 27999,
+    price: 467,
     image: '/placeholder.svg',
     specs: {
       size: '27"',
@@ -41,7 +41,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'ProArt PA278CV',
     brand: 'ASUS',
-    price: 29999,
+    price: 500,
     image: '/placeholder.svg',
     specs: {
       size: '27"',
@@ -59,7 +59,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'Nitro XV272U',
     brand: 'Acer',
-    price: 19999,
+    price: 333,
     image: '/placeholder.svg',
     specs: {
       size: '27"',
@@ -76,7 +76,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'UltraSharp U2720Q',
     brand: 'Dell',
-    price: 41999,
+    price: 700,
     image: '/placeholder.svg',
     specs: {
       size: '27"',
@@ -94,7 +94,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'PX277 Prime',
     brand: 'Pixio',
-    price: 16999,
+    price: 283,
     image: '/placeholder.svg',
     specs: {
       size: '27"',
@@ -111,7 +111,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'Odyssey Neo G9',
     brand: 'Samsung',
-    price: 89999,
+    price: 1500,
     image: '/placeholder.svg',
     specs: {
       size: '49" Ultrawide',
@@ -129,7 +129,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'EX2510',
     brand: 'BenQ',
-    price: 13999,
+    price: 233,
     image: '/placeholder.svg',
     specs: {
       size: '24.5"',
@@ -146,7 +146,7 @@ export const Monitors: Part[] = [
     category: 'Monitor',
     name: 'M32U',
     brand: 'Gigabyte',
-    price: 49999,
+    price: 833,
     image: '/placeholder.svg',
     specs: {
       size: '32"',

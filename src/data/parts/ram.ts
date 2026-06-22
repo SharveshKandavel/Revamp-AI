@@ -6,7 +6,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Vengeance LPX 16GB',
     brand: 'Corsair',
-    price: 4999,
+    price: 83,
     image: '/placeholder.svg',
     specs: {
       capacity: '16GB (2x8GB)',
@@ -22,7 +22,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Trident Z RGB 32GB',
     brand: 'G.Skill',
-    price: 11999,
+    price: 200,
     image: '/placeholder.svg',
     specs: {
       capacity: '32GB (2x16GB)',
@@ -38,7 +38,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Dominator Platinum RGB 64GB',
     brand: 'Corsair',
-    price: 24999,
+    price: 417,
     image: '/placeholder.svg',
     specs: {
       capacity: '64GB (2x32GB)',
@@ -54,7 +54,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Fury Beast 32GB',
     brand: 'Kingston',
-    price: 8999,
+    price: 150,
     image: '/placeholder.svg',
     specs: {
       capacity: '32GB (2x16GB)',
@@ -70,7 +70,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Ripjaws S5 16GB',
     brand: 'G.Skill',
-    price: 5999,
+    price: 100,
     image: '/placeholder.svg',
     specs: {
       capacity: '16GB (2x8GB)',
@@ -86,7 +86,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Ballistix RGB 64GB',
     brand: 'Crucial',
-    price: 22999,
+    price: 383,
     image: '/placeholder.svg',
     specs: {
       capacity: '64GB (2x32GB)',
@@ -102,7 +102,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Vengeance RGB Pro 32GB',
     brand: 'Corsair',
-    price: 13999,
+    price: 233,
     image: '/placeholder.svg',
     specs: {
       capacity: '32GB (4x8GB)',
@@ -118,7 +118,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Trident Z5 RGB 32GB',
     brand: 'G.Skill',
-    price: 15999,
+    price: 267,
     image: '/placeholder.svg',
     specs: {
       capacity: '32GB (2x16GB)',
@@ -134,7 +134,7 @@ export const RAMs: Part[] = [
     category: 'RAM',
     name: 'Value RAM 8GB',
     brand: 'Crucial',
-    price: 2499,
+    price: 42,
     image: '/placeholder.svg',
     specs: {
       capacity: '8GB (1x8GB)',

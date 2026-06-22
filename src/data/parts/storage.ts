@@ -6,7 +6,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: '970 EVO Plus 1TB',
     brand: 'Samsung',
-    price: 9999,
+    price: 167,
     image: '/placeholder.svg',
     specs: {
       capacity: '1TB',
@@ -23,7 +23,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'Barracuda 2TB',
     brand: 'Seagate',
-    price: 4299,
+    price: 72,
     image: '/placeholder.svg',
     specs: {
       capacity: '2TB',
@@ -40,7 +40,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: '980 PRO 2TB',
     brand: 'Samsung',
-    price: 19999,
+    price: 333,
     image: '/placeholder.svg',
     specs: {
       capacity: '2TB',
@@ -57,7 +57,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'FireCuda 4TB',
     brand: 'Seagate',
-    price: 9999,
+    price: 167,
     image: '/placeholder.svg',
     specs: {
       capacity: '4TB',
@@ -74,7 +74,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'SN850X 2TB',
     brand: 'Western Digital',
-    price: 17999,
+    price: 300,
     image: '/placeholder.svg',
     specs: {
       capacity: '2TB',
@@ -91,7 +91,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'MP600 PRO XT 4TB',
     brand: 'Corsair',
-    price: 36999,
+    price: 617,
     image: '/placeholder.svg',
     specs: {
       capacity: '4TB',
@@ -108,7 +108,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'IronWolf Pro 8TB',
     brand: 'Seagate',
-    price: 18999,
+    price: 317,
     image: '/placeholder.svg',
     specs: {
       capacity: '8TB',
@@ -125,7 +125,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'KC3000 2TB',
     brand: 'Kingston',
-    price: 16999,
+    price: 283,
     image: '/placeholder.svg',
     specs: {
       capacity: '2TB',
@@ -142,7 +142,7 @@ export const StorageDevices: Part[] = [
     category: 'Storage',
     name: 'Blue SN570 500GB',
     brand: 'Western Digital',
-    price: 4499,
+    price: 75,
     image: '/placeholder.svg',
     specs: {
       capacity: '500GB',

@@ -6,7 +6,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RTX 3060',
     brand: 'Nvidia',
-    price: 30999,
+    price: 517,
     image: '/placeholder.svg',
     specs: {
       memory: '12GB GDDR6',
@@ -22,7 +22,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RX 6600 XT',
     brand: 'AMD',
-    price: 28999,
+    price: 483,
     image: '/placeholder.svg',
     specs: {
       memory: '8GB GDDR6',
@@ -38,7 +38,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RTX 3080',
     brand: 'Nvidia',
-    price: 69999,
+    price: 1167,
     image: '/placeholder.svg',
     specs: {
       memory: '12GB GDDR6X',
@@ -54,7 +54,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'GT 1030',
     brand: 'Nvidia',
-    price: 7999,
+    price: 133,
     image: '/placeholder.svg',
     specs: {
       memory: '2GB GDDR5',
@@ -70,7 +70,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RTX 4090',
     brand: 'Nvidia',
-    price: 169999,
+    price: 2833,
     image: '/placeholder.svg',
     specs: {
       memory: '24GB GDDR6X',
@@ -86,7 +86,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RX 7900 XTX',
     brand: 'AMD',
-    price: 124999,
+    price: 2083,
     image: '/placeholder.svg',
     specs: {
       memory: '24GB GDDR6',
@@ -102,7 +102,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RTX 3060 Ti',
     brand: 'Nvidia',
-    price: 42999,
+    price: 717,
     image: '/placeholder.svg',
     specs: {
       memory: '8GB GDDR6',
@@ -118,7 +118,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RX 6700 XT',
     brand: 'AMD',
-    price: 38999,
+    price: 650,
     image: '/placeholder.svg',
     specs: {
       memory: '12GB GDDR6',
@@ -134,7 +134,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'Intel Arc A770',
     brand: 'Intel',
-    price: 32999,
+    price: 550,
     image: '/placeholder.svg',
     specs: {
       memory: '16GB GDDR6',
@@ -150,7 +150,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RTX 4070',
     brand: 'Nvidia',
-    price: 54999,
+    price: 917,
     image: '/placeholder.svg',
     specs: {
       memory: '12GB GDDR6X',
@@ -166,7 +166,7 @@ export const GPUs: Part[] = [
     category: 'GPU',
     name: 'RX 7800 XT',
     brand: 'AMD',
-    price: 64999,
+    price: 1083,
     image: '/placeholder.svg',
     specs: {
       memory: '16GB GDDR6',

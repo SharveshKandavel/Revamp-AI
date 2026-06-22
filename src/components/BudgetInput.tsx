@@ -26,16 +26,16 @@ const BudgetInput: React.FC = () => {
   };
 
   const budgetRanges = [
-    { label: "Budget", value: 30000, color: "bg-green-400" },
-    { label: "Mid-range", value: 60000, color: "bg-blue-500" },
-    { label: "High-end", value: 100000, color: "bg-purple-500" },
-    { label: "Enthusiast", value: 150000, color: "bg-red-500" }
+    { label: "Budget", value: 500, color: "bg-green-400" },
+    { label: "Mid-range", value: 1000, color: "bg-blue-500" },
+    { label: "High-end", value: 1600, color: "bg-purple-500" },
+    { label: "Enthusiast", value: 2500, color: "bg-red-500" }
   ];
 
   // Calculate a percentage value for the budget progress bar
   const getProgressValue = () => {
     const currentBudget = parseInt(localBudget, 10) || 0;
-    const maxBudget = 200000; // Maximum reference point
+    const maxBudget = 4000; // Maximum reference point
     return Math.min(Math.round((currentBudget / maxBudget) * 100), 100);
   };
 
@@ -99,7 +99,7 @@ const BudgetInput: React.FC = () => {
               >
                 <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">{range.label}</div>
                 <div className={`text-lg font-bold ${range.color.replace('bg-', 'text-')}`}>
-                  ${(range.value / 1000).toLocaleString()}k
+                  ${range.value.toLocaleString()}
                 </div>
               </button>
             ))}

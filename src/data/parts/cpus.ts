@@ -7,7 +7,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Ryzen 5 5600X',
     brand: 'AMD',
-    price: 16999,
+    price: 283,
     image: '/placeholder.svg',
     specs: {
       cores: 6,
@@ -25,7 +25,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i5-12600K',
     brand: 'Intel',
-    price: 21999,
+    price: 367,
     image: '/placeholder.svg',
     specs: {
       cores: 10,
@@ -43,7 +43,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Ryzen 7 5800X',
     brand: 'AMD',
-    price: 27999,
+    price: 467,
     image: '/placeholder.svg',
     specs: {
       cores: 8,
@@ -61,7 +61,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i3-12100F',
     brand: 'Intel',
-    price: 8999,
+    price: 150,
     image: '/placeholder.svg',
     specs: {
       cores: 4,
@@ -79,7 +79,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Ryzen 9 7950X',
     brand: 'AMD',
-    price: 54999,
+    price: 917,
     image: '/placeholder.svg',
     specs: {
       cores: 16,
@@ -97,7 +97,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i9-13900K',
     brand: 'Intel',
-    price: 57999,
+    price: 967,
     image: '/placeholder.svg',
     specs: {
       cores: 24,
@@ -115,7 +115,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i7-13700K',
     brand: 'Intel',
-    price: 36999,
+    price: 617,
     image: '/placeholder.svg',
     specs: {
       cores: 16,
@@ -133,7 +133,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Ryzen 5 7600X',
     brand: 'AMD',
-    price: 23999,
+    price: 400,
     image: '/placeholder.svg',
     specs: {
       cores: 6,
@@ -151,7 +151,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i3-13100F',
     brand: 'Intel',
-    price: 10999,
+    price: 183,
     image: '/placeholder.svg',
     specs: {
       cores: 4,
@@ -169,7 +169,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Ryzen 3 4100',
     brand: 'AMD',
-    price: 6999,
+    price: 117,
     image: '/placeholder.svg',
     specs: {
       cores: 4,
@@ -187,7 +187,7 @@ export const CPUs: Part[] = [
     category: 'CPU',
     name: 'Core i7-14700K',
     brand: 'Intel',
-    price: 42999,
+    price: 717,
     image: '/placeholder.svg',
     specs: {
       cores: 20,

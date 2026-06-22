@@ -6,7 +6,7 @@ export const Motherboards: Part[] = [
     category: 'Motherboard',
     name: 'B550 Gaming Plus',
     brand: 'MSI',
-    price: 12999,
+    price: 217,
     image: '/placeholder.svg',
     specs: {
       socket: 'AM4',
@@ -23,7 +23,7 @@ export const Motherboards: Part[] = [
     category: 'Motherboard',
     name: 'Z690 Gaming X',
     brand: 'Gigabyte',
-    price: 19999,
+    price: 333,
     image: '/placeholder.svg',
     specs: {
       socket: 'LGA1700',
@@ -40,7 +40,7 @@ export const Motherboards: Part[] = [
     category: 'Motherboard',
     name: 'ROG Strix X670E-E',
     brand: 'ASUS',
-    price: 42999,
+    price: 717,
     image: '/placeholder.svg',
     specs: {
       socket: 'AM5',
@@ -57,7 +57,7 @@ export const Motherboards: Part[] = [
     category: 'Motherboard',
     name: 'MAG B760M Mortar',
     brand: 'MSI',
-    price: 15999,
+    price: 267,
     image: '/placeholder.svg',
     specs: {
       socket: 'LGA1700',
@@ -74,7 +74,7 @@ export const Motherboards: Part[] = [
     category: 'Motherboard',
     name: 'B650 AORUS Elite AX',
     brand: 'Gigabyte',
-    price: 18999,
+    price: 317,
     image: '/placeholder.svg',
     specs: {
       socket: 'AM5',
