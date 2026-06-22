@@ -27,7 +27,7 @@ if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
 
 supabase: Client = create_client(SUPABASE_URL or "", SUPABASE_SERVICE_ROLE_KEY or "")
 
-@app.get("/")
+@app.get("/api")
 async def root():
     return {"message": "Revamp Backend is running"}
 
@@ -80,7 +80,7 @@ class BuildCreate(BaseModel):
 
 # --- Endpoints ---
 
-@app.get("/catalog")
+@app.get("/api/catalog")
 async def get_catalog():
     """Fetch the complete hardware catalog from the database."""
     try:
@@ -90,7 +90,7 @@ async def get_catalog():
         print(f"Catalog fetch error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch catalog")
 
-@app.post("/builds")
+@app.post("/api/builds")
 async def save_build(build: BuildCreate):
     """Validate and persist a hardware configuration."""
     try:
@@ -117,7 +117,7 @@ async def save_build(build: BuildCreate):
         print(f"Build save error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/builds")
+@app.get("/api/builds")
 async def get_all_builds():
     """Fetch all public build configurations for the community showcase."""
     try:
@@ -127,7 +127,7 @@ async def get_all_builds():
         print(f"Public builds fetch error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch community builds")
 
-@app.get("/builds/{user_id}")
+@app.get("/api/builds/{user_id}")
 async def get_user_builds(user_id: str):
     """Fetch all builds curated by a specific user."""
     try:
@@ -279,7 +279,7 @@ async def is_category_fresh(category: str) -> bool:
         return False
 
 
-@app.post("/sync-category/{category}")
+@app.post("/api/sync-category/{category}")
 async def sync_category(category: str, background_tasks: BackgroundTasks):
     """
     Search for products in a category and sync with caching and resilience.
@@ -373,7 +373,7 @@ async def sync_category(category: str, background_tasks: BackgroundTasks):
 
 import asyncio
 
-@app.post("/sync-all")
+@app.post("/api/sync-all")
 async def sync_all_categories():
     """
     Sync all 8 part categories in one call.
@@ -484,6 +484,6 @@ async def sync_all_categories():
     }
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     return {"status": "ok", "cache_ttl_hours": CACHE_TTL_HOURS}

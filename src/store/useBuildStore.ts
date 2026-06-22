@@ -5,7 +5,7 @@ import { recommendParts } from '@/data/parts/recommendations';
 import { supabase } from '@/lib/supabase';
 
 // Configuration
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "/api";
 
 interface BuildState {
   purpose: PurposeType | null;
