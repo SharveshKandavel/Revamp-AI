@@ -19,5 +19,5 @@ export const getAffiliateLink = (asin: string): string => {
  */
 export const formatAmazonPrice = (priceCents: number | undefined): string => {
   if (priceCents === undefined || priceCents === null) return 'N/A';
-  return `₹${(priceCents / 100).toLocaleString('en-IN')}`;
+  return `$${(priceCents / 100).toLocaleString('en-CA')}`;
 };

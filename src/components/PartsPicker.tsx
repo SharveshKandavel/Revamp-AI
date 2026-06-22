@@ -60,7 +60,7 @@ const PartCard: React.FC<PartCardProps> = ({ part, isSelected, onSelect, isAutoS
               <CardDescription className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">{part.brand}</CardDescription>
             </div>
             <div className="text-xl font-black text-tech-purple ml-2">
-              {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `₹${part.price.toLocaleString()}`}
+              {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `$${part.price.toLocaleString()}`}
             </div>
           </div>
         </CardHeader>

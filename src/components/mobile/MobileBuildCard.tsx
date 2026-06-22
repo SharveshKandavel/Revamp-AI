@@ -30,7 +30,7 @@ const MobileBuildCard: React.FC<MobileBuildCardProps> = ({ build, onView }) => {
       try {
         await Share.share({
           title: `Check out this PC build: ${build.name}`,
-          text: `${build.name} - ₹${build.price.toLocaleString()} - Perfect for ${build.purpose}`,
+          text: `${build.name} - $${build.price.toLocaleString()} - Perfect for ${build.purpose}`,
           url: `${window.location.origin}/builds/${build.id}`,
         });
       } catch (error) {
@@ -43,7 +43,7 @@ const MobileBuildCard: React.FC<MobileBuildCardProps> = ({ build, onView }) => {
         try {
           await navigator.share({
             title: `PC Build: ${build.name}`,
-            text: `${build.name} - ₹${build.price.toLocaleString()}`,
+            text: `${build.name} - $${build.price.toLocaleString()}`,
             url: window.location.href,
           });
         } catch (error) {
@@ -92,7 +92,7 @@ const MobileBuildCard: React.FC<MobileBuildCardProps> = ({ build, onView }) => {
                 {build.name}
               </CardTitle>
               <p className="text-2xl font-bold text-primary mt-1">
-                ₹{build.price.toLocaleString()}
+                ${build.price.toLocaleString()}
               </p>
             </div>
             <Badge variant="secondary" className="ml-2 shrink-0">

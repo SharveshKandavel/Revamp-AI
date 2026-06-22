@@ -253,7 +253,7 @@ const SellerDashboardContent = () => {
             <StatsCard title="Total Products" value={products.length} icon={<Package className="h-8 w-8 text-tech-purple" />} change="+5%" />
             <StatsCard title="Active Orders" value={orders.length} icon={<ShoppingCart className="h-8 w-8 text-tech-green" />} change="+12%" />
             <StatsCard title="Active Customers" value={847} icon={<Users className="h-8 w-8 text-tech-blue" />} change="+18%" />
-            <StatsCard title="Revenue" value={`₹${revenue.toLocaleString()}`} icon={<TrendingUp className="h-8 w-8 text-tech-accent" />} change="+3%" />
+            <StatsCard title="Revenue" value={`$${revenue.toLocaleString()}`} icon={<TrendingUp className="h-8 w-8 text-tech-accent" />} change="+3%" />
           </div>
 
           <Tabs defaultValue="products" className="mb-10">
@@ -312,7 +312,7 @@ const SellerDashboardContent = () => {
                                 </div>
                               </td>
                               <td className="py-4 px-2">{product.category}</td>
-                              <td className="py-4 px-2">₹{product.price.toLocaleString()}</td>
+                              <td className="py-4 px-2">${product.price.toLocaleString()}</td>
                               <td className="py-4 px-2">
                                 <Badge variant={product.stock > 10 ? "default" : product.stock > 0 ? "secondary" : "destructive"}>
                                   {product.stock} units
@@ -354,7 +354,7 @@ const SellerDashboardContent = () => {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" />
                         <YAxis />
-                        <Tooltip formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Sales']} />
+                        <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Sales']} />
                         <Bar dataKey="sales" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -395,7 +395,7 @@ const SellerDashboardContent = () => {
                             <tr key={order.id} className="border-b">
                               <td className="py-4 px-2 font-medium">{order.id}</td>
                               <td className="py-4 px-2">{order.customer_name}</td>
-                              <td className="py-4 px-2">₹{order.total_price.toLocaleString()}</td>
+                              <td className="py-4 px-2">${order.total_price.toLocaleString()}</td>
                               <td className="py-4 px-2">
                                 <Badge className={getStatusColor(order.status)}>
                                   {order.status}
@@ -456,7 +456,7 @@ const SellerDashboardContent = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="price" className="text-xs font-black uppercase tracking-widest text-gray-400">Valuation (₹)</Label>
+                    <Label htmlFor="price" className="text-xs font-black uppercase tracking-widest text-gray-400">Valuation ($)</Label>
                     <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} className="bg-white/20 border-white/20" />
                   </div>
                   <div className="space-y-2">

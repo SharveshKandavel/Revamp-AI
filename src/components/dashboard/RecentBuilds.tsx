@@ -91,7 +91,7 @@ const RecentBuilds = () => {
                   </p>
                 </div>
               </div>
-              <div className="font-bold text-tech-dark">₹{build.total_price.toLocaleString()}</div>
+              <div className="font-bold text-tech-dark">${build.total_price.toLocaleString()}</div>
             </div>
           ))}
           

@@ -99,13 +99,13 @@ const PowerConsumptionCalculator = () => {
             <div className="bg-gray-50 p-3 rounded-lg">
               <p className="text-sm text-gray-600">Daily Cost (24h)</p>
               <p className="font-medium">
-                ₹{((totalPower * 24 * 0.08) / 1000).toFixed(2)}
+                ${((totalPower * 24 * 0.08) / 1000).toFixed(2)}
               </p>
             </div>
             <div className="bg-gray-50 p-3 rounded-lg">
               <p className="text-sm text-gray-600">Monthly Cost</p>
               <p className="font-medium">
-                ₹{((totalPower * 24 * 30 * 0.08) / 1000).toFixed(2)}
+                ${((totalPower * 24 * 30 * 0.08) / 1000).toFixed(2)}
               </p>
             </div>
           </div>

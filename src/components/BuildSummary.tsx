@@ -99,7 +99,7 @@ const BuildSummary: React.FC = () => {
           <div className="text-right">
             <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Curation Value</div>
             <div className="text-3xl font-black text-tech-purple">
-              ₹{totalPrice.toLocaleString()}
+              ${totalPrice.toLocaleString()}
             </div>
           </div>
         </div>
@@ -137,7 +137,7 @@ const BuildSummary: React.FC = () => {
                   {part ? (
                     <>
                       <span className="font-black text-sm whitespace-nowrap dark:text-white">
-                        {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `₹${part.price.toLocaleString()}`}
+                        {part.current_price_cents ? formatAmazonPrice(part.current_price_cents) : `$${part.price.toLocaleString()}`}
                       </span>
                       
                       {amazonUrl && (

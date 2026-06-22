@@ -101,7 +101,7 @@ const Header: React.FC<HeaderProps> = () => {
               className="bg-white border border-tech-accent/20 px-4 py-2 rounded-lg shadow-sm hidden sm:block"
             >
               <span className="text-tech-accent font-medium">Build: </span>
-              <span className="font-bold">₹{totalPrice.toLocaleString()}</span>
+              <span className="font-bold">${totalPrice.toLocaleString()}</span>
             </motion.div>
           )}
 

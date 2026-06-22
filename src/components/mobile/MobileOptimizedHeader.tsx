@@ -101,7 +101,7 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
                 animate={{ scale: 1 }}
                 className="hidden sm:flex bg-card border border-border px-3 py-1.5 rounded-lg shadow-sm"
               >
-                <span className="text-primary font-semibold text-sm">₹{totalPrice.toLocaleString()}</span>
+                <span className="text-primary font-semibold text-sm">${totalPrice.toLocaleString()}</span>
               </motion.div>
             )}
             
@@ -151,7 +151,7 @@ const MobileOptimizedHeader: React.FC<MobileOptimizedHeaderProps> = ({ userType 
                         </p>
                         {totalPrice > 0 && (
                           <p className="text-sm text-muted-foreground">
-                            Current Build: ₹{totalPrice.toLocaleString()}
+                            Current Build: ${totalPrice.toLocaleString()}
                           </p>
                         )}
                       </div>

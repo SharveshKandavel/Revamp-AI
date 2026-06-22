@@ -57,7 +57,7 @@ const BuildOptions: React.FC = () => {
           <div className="text-right">
             <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Valuation</div>
             <div className="text-3xl font-black text-tech-dark dark:text-white leading-none">
-              ₹{totalPrice.toLocaleString()}
+              ${totalPrice.toLocaleString()}
             </div>
           </div>
         </div>

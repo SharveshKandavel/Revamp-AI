@@ -19,7 +19,7 @@ const BudgetInput: React.FC = () => {
     const parsedBudget = parseInt(localBudget, 10);
     if (!isNaN(parsedBudget) && parsedBudget > 0) {
       setBudget(parsedBudget);
-      toast.success(`Budget set to ₹${parsedBudget.toLocaleString()}`);
+      toast.success(`Budget set to $${parsedBudget.toLocaleString()}`);
     } else {
       toast.error("Please enter a valid budget");
     }
@@ -54,7 +54,7 @@ const BudgetInput: React.FC = () => {
         <div className="flex flex-col space-y-10">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none">
-              <span className="text-2xl font-light text-gray-400">₹</span>
+              <span className="text-2xl font-light text-gray-400">$</span>
             </div>
             <input
               type="text"
@@ -89,7 +89,7 @@ const BudgetInput: React.FC = () => {
                 onClick={() => {
                   setLocalBudget(range.value.toString());
                   setBudget(range.value);
-                  toast.success(`Investment established at ₹${range.value.toLocaleString()}`);
+                  toast.success(`Investment established at $${range.value.toLocaleString()}`);
                 }}
                 className={`p-4 border rounded-2xl text-left transition-all duration-300 hover-lift ${
                   budget === range.value 
@@ -99,7 +99,7 @@ const BudgetInput: React.FC = () => {
               >
                 <div className="text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-2">{range.label}</div>
                 <div className={`text-lg font-bold ${range.color.replace('bg-', 'text-')}`}>
-                  ₹{(range.value / 1000).toLocaleString()}k
+                  ${(range.value / 1000).toLocaleString()}k
                 </div>
               </button>
             ))}

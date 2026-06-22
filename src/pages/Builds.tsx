@@ -303,7 +303,7 @@ const BuildCard = ({ build, index, onLike, onShare, onRemix, isSavedTab }: {
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-2"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /><span>{build.rating || "5.0"}</span></div>
             <div className="flex items-center gap-2"><Heart className="h-4 w-4" /><span>{build.likes || 0}</span></div>
-            <div className="flex items-center gap-2 font-bold text-tech-dark"><span>₹{(Number(build.total_price) || Number(build.price) || 0).toLocaleString()}</span></div>
+            <div className="flex items-center gap-2 font-bold text-tech-dark"><span>${(Number(build.total_price) || Number(build.price) || 0).toLocaleString()}</span></div>
           </div>
           <div className="flex items-center justify-between pt-2 border-t mt-auto">
             <div className="flex items-center gap-1.5 text-xs text-gray-500 line-clamp-1 flex-1">
