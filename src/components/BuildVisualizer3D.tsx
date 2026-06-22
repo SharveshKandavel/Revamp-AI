@@ -148,11 +148,13 @@ const BuildVisualizer3D = () => {
     }
   }, [initialAnimation]);
 
-  // Only show when parts are selected
-  if (Object.values(selectedParts).filter(Boolean).length < 1) return <div style={{ display: 'none' }} />;
+  // Removed early return
+
+  const isVisible = Object.values(selectedParts).filter(Boolean).length >= 1;
 
   return (
-    <Card className="mb-8">
+    <div style={{ display: isVisible ? 'block' : 'none' }}>
+      <Card className="mb-8">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center gap-2">
@@ -246,7 +248,8 @@ const BuildVisualizer3D = () => {
           </p>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

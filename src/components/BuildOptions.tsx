@@ -13,9 +13,7 @@ const BuildOptions: React.FC = () => {
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
-  if (selectedCount < 3) {
-    return <div style={{ display: 'none' }} />;
-  }
+  // Removed early return
 
   // Generate affiliate links for entire build
   const getWholeSetupLinks = () => {
@@ -45,7 +43,8 @@ const BuildOptions: React.FC = () => {
   };
 
   return (
-    <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
+    <div style={{ display: selectedCount < 3 ? 'none' : 'block' }}>
+      <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
       <CardHeader className="px-8 pt-8 border-b border-white/10 bg-white/5">
         <div className="flex justify-between items-center w-full">
           <div>
@@ -79,7 +78,8 @@ const BuildOptions: React.FC = () => {
           <span>Acquire Component List on Amazon</span>
         </button>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

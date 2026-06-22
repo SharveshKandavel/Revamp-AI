@@ -11,13 +11,14 @@ const BuildCompatibilityVisualizer = () => {
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
-  if (selectedCount < 2) return <div style={{ display: 'none' }} />;
+  // Removed early return
 
   // Calculate compatibility percentage
   const compatibilityScore = compatibilityResult.compatible ? 100 : 70;
 
   return (
-    <Card className="mb-8 overflow-hidden">
+    <div style={{ display: selectedCount < 2 ? 'none' : 'block' }}>
+      <Card className="mb-8 overflow-hidden">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Zap className="w-5 h-5 text-tech-purple" />
@@ -58,7 +59,8 @@ const BuildCompatibilityVisualizer = () => {
           </div>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

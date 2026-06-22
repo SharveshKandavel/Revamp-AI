@@ -39,9 +39,7 @@ const BuildSummary: React.FC = () => {
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
-  if (selectedCount === 0) {
-    return <div style={{ display: 'none' }} />;
-  }
+  // Removed early return
 
   // Calculate and display the build performance level
   const calculatePerformanceLevel = () => {
@@ -87,7 +85,8 @@ const BuildSummary: React.FC = () => {
   };
 
   return (
-    <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
+    <div style={{ display: selectedCount === 0 ? 'none' : 'block' }}>
+      <Card className="mb-8 glass-card border-none shadow-2xl overflow-hidden">
       <CardHeader className="px-8 pt-8">
         <div className="flex justify-between items-start">
           <div>
@@ -225,7 +224,8 @@ const BuildSummary: React.FC = () => {
           Cloud Sync Matrix
         </button>
       </CardFooter>
-    </Card>
+      </Card>
+    </div>
   );
 };
 

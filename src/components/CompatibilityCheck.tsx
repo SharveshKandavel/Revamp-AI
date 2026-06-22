@@ -11,13 +11,11 @@ const CompatibilityCheck: React.FC = () => {
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
-  // Don't show if no parts are selected
-  if (selectedCount < 2) {
-    return <div style={{ display: 'none' }} />;
-  }
+  // Removed early return
 
   return (
-    <motion.div
+    <div style={{ display: selectedCount < 2 ? 'none' : 'block' }}>
+      <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -58,6 +56,7 @@ const CompatibilityCheck: React.FC = () => {
         </CardContent>
       </Card>
     </motion.div>
+    </div>
   );
 };
 

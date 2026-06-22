@@ -34,11 +34,13 @@ const PowerConsumptionCalculator = () => {
   const isPSUInsufficient = selectedPSUWattage > 0 && selectedPSUWattage < totalPower;
   const isPSULowHeadroom = selectedPSUWattage > 0 && selectedPSUWattage >= totalPower && selectedPSUWattage < recommendedPSU;
 
-  // Only show when parts are selected
-  if (Object.values(selectedParts).filter(Boolean).length < 2) return <div style={{ display: 'none' }} />;
+  // Removed early return
+
+  const isVisible = Object.values(selectedParts).filter(Boolean).length >= 2;
 
   return (
-    <Card className="mb-8">
+    <div style={{ display: isVisible ? 'block' : 'none' }}>
+      <Card className="mb-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Zap className="w-5 h-5 text-tech-purple" />
@@ -111,7 +113,8 @@ const PowerConsumptionCalculator = () => {
           </div>
         </div>
       </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 
