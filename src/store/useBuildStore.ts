@@ -58,11 +58,10 @@ export const useBuildStore = create<BuildState>((set, get) => ({
   fetchCatalog: async () => {
     set({ isLoading: true });
     try {
-      // Try to fetch from backend
-      const response = await fetch(`${API_BASE_URL}/catalog`);
-      if (!response.ok) throw new Error("Backend unavailable");
+      // Fetch directly from Supabase for speed and reliability
+      const { data, error } = await supabase.from('products').select('*');
       
-      const data = await response.json();
+      if (error) throw new Error(error.message);
 
       if (!data || data.length < 5) {
         throw new Error("Catalog is empty/sparse");
