@@ -97,33 +97,30 @@ export const useBuildStore = create<BuildState>((set, get) => ({
 
   saveBuild: async (title: string, description: string, userId: string) => {
     const { selectedParts, compatibilityResult } = get();
-    
+    const totalPrice = Object.values(selectedParts).reduce(
+      (sum, part) => sum + (part ? part.price : 0), 0
+    );
+
     const buildData = {
       user_id: userId,
       title,
       description,
       parts: selectedParts,
+      total_price: totalPrice,
       compatibility_score: compatibilityResult.compatible ? 100 : 50,
-      is_public: true
+      performance_metrics: {},
+      likes: 0,
+      is_public: true,
     };
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/builds`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildData)
-      });
+    const { data, error } = await supabase
+      .from('builds')
+      .insert(buildData)
+      .select()
+      .single();
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Failed to save build");
-      }
-
-      return await response.json();
-    } catch (err) {
-      console.error("Build persist error:", err);
-      throw err;
-    }
+    if (error) throw new Error(error.message);
+    return data;
   },
 
   fetchUserBuilds: async (userId: string) => {

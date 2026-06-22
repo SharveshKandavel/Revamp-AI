@@ -216,7 +216,7 @@ const BuildSummary: React.FC = () => {
           className="w-full h-12 rounded-xl flex items-center justify-center gap-2 transition-all text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-tech-purple hover:bg-tech-purple/5"
         >
           <Save className="w-4 h-4" />
-          Cloud Sync Matrix
+          Save the Build
         </button>
       </CardFooter>
       </Card>
