@@ -33,10 +33,13 @@ const BuildOptions: React.FC = () => {
 
   const handlePlaceOrder = () => {
     setIsSubmitting(true);
+    
+    const amazonUrl = getWholeSetupLinks();
+    window.open(amazonUrl, '_blank');
+    toast.success("Redirecting to Amazon!");
+    
+    // Reset the submitting state
     setTimeout(() => {
-      const amazonUrl = getWholeSetupLinks();
-      window.open(amazonUrl, '_blank');
-      toast.success("Redirecting to Amazon!");
       setIsSubmitting(false);
     }, 500);
   };
