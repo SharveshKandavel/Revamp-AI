@@ -62,7 +62,7 @@ export const useBuildStore = create<BuildState>((set, get) => ({
       const response = await fetch(`${API_BASE_URL}/catalog`);
       if (!response.ok) throw new Error("Backend unavailable");
       
-      let data = await response.json();
+      const data = await response.json();
 
       if (!data || data.length < 5) {
         throw new Error("Catalog is empty/sparse");

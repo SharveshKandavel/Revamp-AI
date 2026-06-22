@@ -1,12 +1,11 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useBuildStore, useTotalPrice } from "@/store/useBuildStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { Check, ExternalLink, HardDrive, Layers, MonitorSmartphone, Package, Plug, ShieldAlert, Unplug, X, ShoppingCart, Save } from "lucide-react";
 import { PartCategory } from "@/data/parts/types";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { getAffiliateLink, formatAmazonPrice } from "@/utils/amazonUtils";
 
 const categoryIcons: Record<PartCategory, React.ReactNode> = {

@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Monitor, Clock, CheckCircle2, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -13,13 +12,7 @@ const RecentBuilds = () => {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchRecentBuilds();
-    }
-  }, [user]);
-
-  const fetchRecentBuilds = async () => {
+  const fetchRecentBuilds = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -31,12 +24,19 @@ const RecentBuilds = () => {
 
       if (error) throw error;
       setBuilds(data || []);
-    } catch (err: any) {
-      console.error("Error fetching builds:", err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      console.error("Error fetching builds:", message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user) {
+      fetchRecentBuilds();
+    }
+  }, [user, fetchRecentBuilds]);
 
   const toggleStatus = async (id: number, currentPerformance: string) => {
     // In this simplified schema, we use 'performance' to denote status for demo purposes
