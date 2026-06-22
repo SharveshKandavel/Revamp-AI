@@ -11,7 +11,7 @@ const BuildCompatibilityVisualizer = () => {
   // Count selected parts
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
-  if (selectedCount < 2) return null;
+  if (selectedCount < 2) return <div style={{ display: 'none' }} />;
 
   // Calculate compatibility percentage
   const compatibilityScore = compatibilityResult.compatible ? 100 : 70;

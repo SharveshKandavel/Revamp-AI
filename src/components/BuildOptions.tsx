@@ -14,7 +14,7 @@ const BuildOptions: React.FC = () => {
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
   if (selectedCount < 3) {
-    return null;
+    return <div style={{ display: 'none' }} />;
   }
 
   // Generate affiliate links for entire build
@@ -69,11 +69,13 @@ const BuildOptions: React.FC = () => {
           onClick={handlePlaceOrder}
           disabled={isSubmitting}
         >
-          {isSubmitting ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <ShoppingCart className="w-5 h-5" />
-          )}
+          <div className="flex items-center justify-center w-5 h-5">
+            {isSubmitting ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <ShoppingCart className="w-5 h-5" />
+            )}
+          </div>
           <span>Acquire Component List on Amazon</span>
         </button>
       </CardContent>

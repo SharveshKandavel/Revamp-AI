@@ -149,7 +149,7 @@ const BuildVisualizer3D = () => {
   }, [initialAnimation]);
 
   // Only show when parts are selected
-  if (Object.values(selectedParts).filter(Boolean).length < 1) return null;
+  if (Object.values(selectedParts).filter(Boolean).length < 1) return <div style={{ display: 'none' }} />;
 
   return (
     <Card className="mb-8">

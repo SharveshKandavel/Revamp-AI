@@ -40,7 +40,7 @@ const BuildSummary: React.FC = () => {
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
   if (selectedCount === 0) {
-    return null;
+    return <div style={{ display: 'none' }} />;
   }
 
   // Calculate and display the build performance level

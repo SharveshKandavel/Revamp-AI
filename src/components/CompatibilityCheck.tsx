@@ -12,8 +12,8 @@ const CompatibilityCheck: React.FC = () => {
   const selectedCount = Object.values(selectedParts).filter(Boolean).length;
   
   // Don't show if no parts are selected
-  if (selectedCount === 0) {
-    return null;
+  if (selectedCount < 2) {
+    return <div style={{ display: 'none' }} />;
   }
 
   return (

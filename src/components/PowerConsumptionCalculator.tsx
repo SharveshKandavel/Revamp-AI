@@ -35,7 +35,7 @@ const PowerConsumptionCalculator = () => {
   const isPSULowHeadroom = selectedPSUWattage > 0 && selectedPSUWattage >= totalPower && selectedPSUWattage < recommendedPSU;
 
   // Only show when parts are selected
-  if (Object.values(selectedParts).filter(Boolean).length < 2) return null;
+  if (Object.values(selectedParts).filter(Boolean).length < 2) return <div style={{ display: 'none' }} />;
 
   return (
     <Card className="mb-8">
