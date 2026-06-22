@@ -203,8 +203,8 @@ export const useBuildStore = create<BuildState>((set, get) => ({
   },
 
   checkCompatibility: () => {
-    const { selectedParts } = get();
-    const result = isCompatible(selectedParts as any);
+    const { selectedParts, purpose } = get();
+    const result = isCompatible(selectedParts as Record<string, import('@/data/parts/types').Part | null>, purpose);
     set({ compatibilityResult: result });
   },
 }));
