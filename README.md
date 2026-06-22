@@ -5,7 +5,7 @@
 [![Supabase](https://img.shields.io/badge/Backend-Supabase-green?style=for-the-badge&logo=supabase)](https://supabase.com/)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 
-Revamp is a professional, high-performance PC building platform designed for two distinct user ecosystems: **Enthusiasts (Customers)** and **Component Sellers**. 
+Revamp is a professional, high-performance PC building platform.
 
 Built with technical depth and scalability in mind, this project demonstrates a modern full-stack architecture with real-time data synchronization and secure access.
 
@@ -23,7 +23,7 @@ Built with technical depth and scalability in mind, this project demonstrates a 
 
 ## 🕹️ Quick Demo Access
 
-To explore the different professional roles without creating an account, use these test credentials:
+To explore the application without creating an account, use these test credentials:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
@@ -85,7 +85,7 @@ graph LR
 ---
 
 ## 💼 Co-op Portfolio Context
-*This project was developed to demonstrate proficiency in full-stack engineering, secure database design, and high-performance frontend visualization. It solves the real-world problem of providing custom PC builders with elite curation tools.*
+*This project was developed to demonstrate proficiency in full-stack engineering, secure database design, and high-performance frontend visualization. It solves the real-world problem of providing custom PC buyers with elite curation tools.*
 
 ---
 
