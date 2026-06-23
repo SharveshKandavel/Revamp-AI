@@ -58,12 +58,24 @@ export const useBuildStore = create<BuildState>((set, get) => ({
   fetchCatalog: async () => {
     set({ isLoading: true });
     try {
-      // Fetch directly from Supabase for speed and reliability
-      const { data, error } = await supabase.from('products').select('*');
-      
-      if (error) throw new Error(error.message);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ptnorpmduyrjyficbayg.supabase.co';
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0bm9ycG1kdXlyanlmaWNiYXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNjQzNzAsImV4cCI6MjA5NTc0MDM3MH0.oe7ce4qkU916KeMReJRJ5W1F_mxCm5VrcEGbIRgs8nI';
 
-      if (!data || data.length < 5) {
+      // Use native fetch to STRICTLY use the anon key. 
+      // If the user is logged in, supabase-js sends the 'authenticated' JWT, which might lack table GRANT permissions.
+      const response = await fetch(`${supabaseUrl}/rest/v1/products?select=*`, {
+        headers: {
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
         throw new Error("Catalog is empty/sparse");
       }
 
@@ -82,13 +94,14 @@ export const useBuildStore = create<BuildState>((set, get) => ({
         amazon_url: p.amazon_url
       }));
 
+      // Update recommendations right away using the new catalog 
       set({ catalog: parts });
+      get().updateRecommendations();
     } catch (err) {
       console.error("Failed to load catalog from Supabase:", err);
       // Empty catalog state handled gracefully by UI
       set({ catalog: [] });
     } finally {
-      get().updateRecommendations();
       set({ isLoading: false });
     }
   },
