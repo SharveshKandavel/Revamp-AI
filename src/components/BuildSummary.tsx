@@ -62,7 +62,7 @@ const BuildSummary: React.FC = () => {
   const handleSaveBuild = async () => {
     if (!isAuthenticated || !user) {
       toast.error("Please login to save your build", {
-        description: "Join Revamp AI to keep your custom configurations."
+        description: "Join Revamp to keep your custom configurations."
       });
       return;
     }

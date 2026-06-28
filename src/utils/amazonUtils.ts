@@ -2,7 +2,7 @@
  * Amazon Affiliate Utilities
  */
 
-const AMAZON_TAG = 'revampai-20'; // Your verified Store ID
+const AMAZON_TAG = 'revamp-20'; // Your verified Store ID
 
 /**
  * Constructs a programmatically valid Amazon Canada affiliate link.

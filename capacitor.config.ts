@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.revampai.pcbuilder',
+  appId: 'com.revamp.pcbuilder',
   appName: 'Revamp PC Builder',
   webDir: 'dist',
   server: {

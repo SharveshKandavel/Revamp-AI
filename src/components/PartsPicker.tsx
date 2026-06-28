@@ -138,10 +138,10 @@ const PartsPicker: React.FC = () => {
     Storage: false, PowerSupply: false, Case: false, Monitor: false
   });
   
-  const [aiSelectionCompleted, setAiSelectionCompleted] = useState<boolean>(false);
+  const [autoSelectionCompleted, setAutoSelectionCompleted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (buildMode === "automatic" && purpose && budget > 0 && !aiSelectionCompleted) {
+    if (buildMode === "automatic" && purpose && budget > 0 && !autoSelectionCompleted) {
       const newAutoSelected: Record<PartCategory, boolean> = {
         CPU: false, GPU: false, Motherboard: false, RAM: false,
         Storage: false, PowerSupply: false, Case: false, Monitor: false
@@ -155,10 +155,10 @@ const PartsPicker: React.FC = () => {
       });
       
       setAutoSelectedParts(newAutoSelected);
-      setAiSelectionCompleted(true);
+      setAutoSelectionCompleted(true);
       toast.success("Algorithm complete: optimal components selected.");
     }
-  }, [buildMode, purpose, budget, recommendations, selectPart, aiSelectionCompleted]);
+  }, [buildMode, purpose, budget, recommendations, selectPart, autoSelectionCompleted]);
 
   if (!purpose || budget <= 0) return null;
 
